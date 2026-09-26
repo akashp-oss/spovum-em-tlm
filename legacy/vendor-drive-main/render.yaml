@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: vendor-drive
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: RELOAD
+        value: "0"
+      # Pin a Python that has wheels for every dependency (avoids build surprises)
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: SITE_PASSWORD
+        sync: false
+      # Render generates this once and keeps it stable — you don't fill it in
+      - key: SECRET_KEY
+        generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: TAVILY_API_KEY
+        sync: false
+      # REQUIRED for a shared, always-on drive: a free Neon Postgres URL
+      # (https://neon.tech). The files AND the search index live here, so the
+      # data belongs to this database, not to any one person's computer.
+      - key: DATABASE_URL
+        sync: false
+      - key: REASONING_DAILY_LIMIT
+        value: "100"
+      - key: WEB_SEARCH_DAILY_LIMIT
+        value: "30"

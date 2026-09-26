@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ops Hub — wireframe</title>
+<style>
+:root{
+  --bg:#ffffff;
+  --panel:#fafafa;
+  --fg:#111111;
+  --muted:#666666;
+  --faint:#999999;
+  --line:#e0e0e0;
+  --line-strong:#c8c8c8;
+  --fill:#f2f2f2;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  font-size:14px;
+  font-weight:400;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input{font:inherit;color:inherit}
+a{color:inherit}
+
+/* ---------- shell ---------- */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ---------- sidebar ---------- */
+.side{
+  width:240px;flex:0 0 240px;
+  border-right:1px solid var(--line);
+  background:var(--panel);
+  display:flex;flex-direction:column;
+  padding:24px 0;
+}
+.brand{padding:0 24px 24px;border-bottom:1px solid var(--line)}
+.brand .mark{width:24px;height:24px;border:1px solid var(--line-strong);margin-bottom:12px}
+.brand .name{font-size:15px;font-weight:500}
+.brand .sub{font-size:13px;color:var(--faint)}
+
+.nav{padding:16px 12px;display:flex;flex-direction:column;gap:2px}
+.nav-label{font-size:13px;color:var(--faint);padding:8px 12px 4px}
+.nav button{
+  display:flex;align-items:center;gap:12px;
+  width:100%;padding:8px 12px;text-align:left;
+  font-size:14px;color:var(--muted);
+}
+.nav button .ico{width:16px;height:16px;border:1px solid var(--line-strong);flex:0 0 16px}
+.nav button.on{color:var(--fg);background:var(--fill)}
+.nav button .count{margin-left:auto;font-size:13px;color:var(--faint)}
+
+.me{margin-top:auto;padding:16px 24px 0;border-top:1px solid var(--line)}
+.me .row{display:flex;align-items:center;gap:12px}
+.me .av{width:32px;height:32px;border:1px solid var(--line-strong);border-radius:50%;flex:0 0 32px}
+.me .n{font-size:14px}
+.me .r{font-size:13px;color:var(--faint)}
+
+/* ---------- main ---------- */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.top{
+  height:64px;flex:0 0 64px;
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:16px;
+  padding:0 32px;
+}
+.top h1{font-size:18px;font-weight:500}
+.search{
+  margin-left:auto;width:320px;height:36px;
+  border:1px solid var(--line);background:var(--bg);
+  display:flex;align-items:center;gap:8px;padding:0 12px;
+}
+.search .ico{width:14px;height:14px;border:1px solid var(--line-strong);border-radius:50%;flex:0 0 14px}
+.search input{border:none;outline:none;width:100%;font-size:14px;background:none}
+.search input::placeholder{color:var(--faint)}
+
+.scroll{flex:1;overflow-y:auto;padding:32px}
+.page{display:none}
+.page.on{display:block}
+
+/* ---------- primitives ---------- */
+.sec{margin-bottom:40px}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px}
+.sec-head h2{font-size:15px;font-weight:500}
+.sec-head .note{font-size:13px;color:var(--faint)}
+.sec-head .act{margin-left:auto;font-size:13px;color:var(--muted);border-bottom:1px solid var(--line-strong)}
+
+.card{border:1px solid var(--line);background:var(--bg);padding:16px}
+.grid{display:grid;gap:16px}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  height:24px;padding:0 8px;border:1px solid var(--line);
+  font-size:13px;color:var(--muted);
+}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--fg)}
+.dot.o{background:none;border:1px solid var(--line-strong)}
+.dot.h{background:var(--line-strong)}
+
+table{width:100%;border-collapse:collapse}
+th{
+  text-align:left;font-size:13px;font-weight:400;color:var(--faint);
+  padding:8px 16px 8px 0;border-bottom:1px solid var(--line);
+}
+td{padding:12px 16px 12px 0;border-bottom:1px solid var(--line);font-size:14px;vertical-align:top}
+tr:hover td{background:var(--panel)}
+.t-sub{font-size:13px;color:var(--faint)}
+.spacer{height:16px}
+
+.bar{height:4px;background:var(--fill);width:100%}
+.bar span{display:block;height:100%;background:var(--line-strong)}
+
+.seg{display:flex;border:1px solid var(--line)}
+.seg button{padding:6px 12px;font-size:13px;color:var(--muted)}
+.seg button.on{background:var(--fill);color:var(--fg)}
+
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.fl{height:32px;padding:0 12px;border:1px solid var(--line);font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.fl.on{border-color:var(--line-strong);color:var(--fg)}
+.caret{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:4px solid var(--faint)}
+
+/* ---------- today ---------- */
+.out{display:flex;gap:8px;flex-wrap:wrap}
+.out .p{display:flex;align-items:center;gap:8px;border:1px solid var(--line);padding:8px 12px}
+.out .av{width:24px;height:24px;border:1px solid var(--line-strong);border-radius:50%}
+.out .n{font-size:14px}
+.out .d{font-size:13px;color:var(--faint)}
+
+.attn{border:1px solid var(--line)}
+.attn .r{display:flex;align-items:center;gap:16px;padding:16px;border-bottom:1px solid var(--line)}
+.attn .r:last-child{border-bottom:none}
+.attn .r:hover{background:var(--panel)}
+.attn .mk{width:8px;height:8px;border:1px solid var(--fg);flex:0 0 8px}
+.attn .mk.f{background:var(--fg)}
+.attn .txt{font-size:14px}
+.attn .why{font-size:13px;color:var(--faint)}
+.attn .go{margin-left:auto;font-size:13px;color:var(--muted)}
+
+.mine{border:1px solid var(--line)}
+.mine .r{display:grid;grid-template-columns:1fr 120px 100px 120px;gap:16px;align-items:center;padding:16px;border-bottom:1px solid var(--line)}
+.mine .r:last-child{border-bottom:none}
+.mine .r:hover{background:var(--panel)}
+.mine .nm{font-size:14px}
+.mine .cl{font-size:13px;color:var(--faint)}
+
+/* ---------- kanban ---------- */
+.kb{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:start}
+.kb-col{border:1px solid var(--line);background:var(--panel);min-height:320px}
+.kb-head{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.kb-head .t{font-size:13px}
+.kb-head .c{margin-left:auto;font-size:13px;color:var(--faint)}
+.kb-body{padding:8px;display:flex;flex-direction:column;gap:8px}
+.kb-card{border:1px solid var(--line);background:var(--bg);padding:12px}
+.kb-card .nm{font-size:14px;margin-bottom:4px}
+.kb-card .cl{font-size:13px;color:var(--faint);margin-bottom:12px}
+.kb-card .ft{display:flex;align-items:center;gap:8px}
+.kb-card .av{width:20px;height:20px;border:1px solid var(--line-strong);border-radius:50%}
+.kb-card .dd{font-size:13px;color:var(--faint);margin-left:auto}
+
+/* ---------- vendors ---------- */
+.v-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.v-card{border:1px solid var(--line);padding:16px}
+.v-card .top{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;height:auto;border:none;padding:0}
+.v-card .nm{font-size:15px;font-weight:500}
+.v-card .ct{font-size:13px;color:var(--faint)}
+.v-card .rate{margin-left:auto;display:flex;gap:2px}
+.v-card .rate i{width:8px;height:8px;border:1px solid var(--fg);display:block}
+.v-card .rate i.f{background:var(--fg)}
+.v-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-bottom:12px}
+.v-meta .k{font-size:13px;color:var(--faint)}
+.v-meta .v{font-size:13px}
+.v-foot{border-top:1px solid var(--line);padding-top:12px;display:flex;align-items:center;gap:8px}
+.v-foot .u{font-size:13px;color:var(--faint)}
+.v-foot .b{margin-left:auto;font-size:13px;border-bottom:1px solid var(--line-strong)}
+
+/* ---------- stack ---------- */
+.vault{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);border:1px solid var(--line);height:28px;padding:0 10px}
+.vault .lk{width:10px;height:12px;border:1px solid var(--line-strong)}
+.masked{letter-spacing:2px;color:var(--faint);font-size:13px}
+.warn{font-size:13px;color:var(--fg);border-bottom:1px solid var(--fg)}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- sidebar -->
+  <aside class="side">
+    <div class="brand">
+      <div class="mark"></div>
+      <div class="name">Ops hub</div>
+      <div class="sub">Bang Design</div>
+    </div>
+
+    <nav class="nav">
+      <button class="on" data-go="today"><span class="ico"></span>Today</button>
+      <button data-go="projects"><span class="ico"></span>Projects<span class="count">14</span></button>
+      <button data-go="vendors"><span class="ico"></span>Vendors<span class="count">68</span></button>
+      <button data-go="stack"><span class="ico"></span>Stack<span class="count">23</span></button>
+      <div class="nav-label">Team</div>
+      <button data-go="people"><span class="ico"></span>People<span class="count">19</span></button>
+    </nav>
+
+    <div class="me">
+      <div class="row">
+        <div class="av"></div>
+        <div>
+          <div class="n">Akash Pai</div>
+          <div class="r">Industrial design</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- main -->
+  <main class="main">
+    <header class="top">
+      <h1 id="title">Today</h1>
+      <div class="search">
+        <span class="ico"></span>
+        <input placeholder="Search projects, vendors, clients, keys">
+      </div>
+    </header>
+
+    <div class="scroll">
+
+      <!-- ============ TODAY ============ -->
+      <section class="page on" id="today">
+
+        <div class="sec">
+          <div class="sec-head">
+            <h2>Who is out</h2>
+            <span class="note">Thursday, 19 September</span>
+          </div>
+          <div class="out">
+            <div class="p"><span class="av"></span><span class="n">Ravi K.</span><span class="d">back Mon 23</span></div>
+            <div class="p"><span class="av"></span><span class="n">Sneha M.</span><span class="d">back tomorrow</span></div>
+            <div class="p"><span class="av"></span><span class="n">Imran S.</span><span class="d">half day</span></div>
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head">
+            <h2>Needs attention</h2>
+            <span class="note">3 items</span>
+          </div>
+          <div class="attn">
+            <div class="r">
+              <span class="mk f"></span>
+              <div>
+                <div class="txt">Aster handle — tooling quote not received</div>
+                <div class="why">Blocked 4 days · waiting on Krishna Tools · you are owner</div>
+              </div>
+              <span class="go">Open</span>
+            </div>
+            <div class="r">
+              <span class="mk"></span>
+              <div>
+                <div class="txt">Nova enclosure — no update in 9 days</div>
+                <div class="why">Sub-owner Imran S. is out today</div>
+              </div>
+              <span class="go">Open</span>
+            </div>
+            <div class="r">
+              <span class="mk"></span>
+              <div>
+                <div class="txt">Figma renews in 6 days — ₹4,800</div>
+                <div class="why">Owner Sneha M. · card ending 4412</div>
+              </div>
+              <span class="go">Open</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head">
+            <h2>My projects</h2>
+            <span class="note">4 active</span>
+            <span class="act">See all</span>
+          </div>
+          <div class="mine">
+            <div class="r">
+              <div><div class="nm">Aster handle</div><div class="cl">Godrej</div></div>
+              <span class="chip"><span class="dot"></span>Blocked</span>
+              <span class="t-sub">Due 26 Sep</span>
+              <span class="t-sub">Updated 4d ago</span>
+            </div>
+            <div class="r">
+              <div><div class="nm">Nova enclosure</div><div class="cl">Zeta Labs</div></div>
+              <span class="chip"><span class="dot h"></span>Active</span>
+              <span class="t-sub">Due 2 Oct</span>
+              <span class="t-sub">Updated today</span>
+            </div>
+            <div class="r">
+              <div><div class="nm">Pulse remote — DFM</div><div class="cl">Zeta Labs</div></div>
+              <span class="chip"><span class="dot h"></span>Active</span>
+              <span class="t-sub">Due 14 Oct</span>
+              <span class="t-sub">Updated 2d ago</span>
+            </div>
+            <div class="r">
+              <div><div class="nm">Clip mechanism study</div><div class="cl">Internal</div></div>
+              <span class="chip"><span class="dot o"></span>Not started</span>
+              <span class="t-sub">Due 30 Oct</span>
+              <span class="t-sub">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head">
+            <h2>My credits this month</h2>
+            <span class="note">18 of 30 used</span>
+          </div>
+          <div class="card">
+            <div class="bar" style="margin-bottom:12px"><span style="width:60%"></span></div>
+            <div style="display:flex;gap:24px">
+              <span class="t-sub">Aster handle · 8</span>
+              <span class="t-sub">Nova enclosure · 6</span>
+              <span class="t-sub">Pulse remote · 4</span>
+              <span class="t-sub" style="margin-left:auto">12 left</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ============ PROJECTS ============ -->
+      <section class="page" id="projects">
+
+        <div class="sec-head">
+          <h2>All projects</h2>
+          <span class="note">14 active · 3 blocked</span>
+          <div class="act" style="border:none;margin-left:auto">
+            <span class="seg">
+              <button class="on" data-view="table">Table</button>
+              <button data-view="board">Board</button>
+            </span>
+          </div>
+        </div>
+
+        <div class="filters">
+          <span class="fl on">All teams<span class="caret"></span></span>
+          <span class="fl">Owner<span class="caret"></span></span>
+          <span class="fl">Client<span class="caret"></span></span>
+          <span class="fl">Status<span class="caret"></span></span>
+        </div>
+
+        <!-- table view -->
+        <div id="v-table">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:26%">Project</th>
+                <th style="width:14%">Client</th>
+                <th style="width:14%">Owner</th>
+                <th style="width:14%">Sub-owner</th>
+                <th style="width:12%">Status</th>
+                <th style="width:10%">Due</th>
+                <th style="width:10%">Last update</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Aster handle<div class="t-sub">Industrial design</div></td>
+                <td>Godrej</td><td>Akash P.</td><td>Ravi K.</td>
+                <td><span class="chip"><span class="dot"></span>Blocked</span></td>
+                <td>26 Sep</td><td class="t-sub">4d ago</td>
+              </tr>
+              <tr>
+                <td>Nova enclosure<div class="t-sub">Engineering</div></td>
+                <td>Zeta Labs</td><td>Akash P.</td><td>Imran S.</td>
+                <td><span class="chip"><span class="dot h"></span>Active</span></td>
+                <td>2 Oct</td><td class="t-sub">Today</td>
+              </tr>
+              <tr>
+                <td>Pulse remote — DFM<div class="t-sub">Engineering</div></td>
+                <td>Zeta Labs</td><td>Imran S.</td><td>Akash P.</td>
+                <td><span class="chip"><span class="dot h"></span>Active</span></td>
+                <td>14 Oct</td><td class="t-sub">2d ago</td>
+              </tr>
+              <tr>
+                <td>Q4 launch film<div class="t-sub">Marketing</div></td>
+                <td>Godrej</td><td>Sneha M.</td><td>—</td>
+                <td><span class="chip"><span class="dot h"></span>Active</span></td>
+                <td>10 Oct</td><td class="t-sub">Yesterday</td>
+              </tr>
+              <tr>
+                <td>Vendor day — Pune<div class="t-sub">Industrial design</div></td>
+                <td>Internal</td><td>Ravi K.</td><td>—</td>
+                <td><span class="chip"><span class="dot"></span>Waiting on vendor</span></td>
+                <td>28 Sep</td><td class="t-sub">6d ago</td>
+              </tr>
+              <tr>
+                <td>Clip mechanism study<div class="t-sub">Industrial design</div></td>
+                <td>Internal</td><td>Akash P.</td><td>—</td>
+                <td><span class="chip"><span class="dot o"></span>Not started</span></td>
+                <td>30 Oct</td><td class="t-sub">—</td>
+              </tr>
+              <tr>
+                <td>Website refresh<div class="t-sub">Marketing</div></td>
+                <td>Internal</td><td>Sneha M.</td><td>Karthik R.</td>
+                <td><span class="chip"><span class="dot h"></span>Active</span></td>
+                <td>18 Oct</td><td class="t-sub">3d ago</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="spacer"></div>
+        </div>
+
+        <!-- board view -->
+        <div id="v-board" style="display:none">
+          <div class="kb">
+            <div class="kb-col">
+              <div class="kb-head"><span class="dot o"></span><span class="t">Not started</span><span class="c">2</span></div>
+              <div class="kb-body">
+                <div class="kb-card">
+                  <div class="nm">Clip mechanism study</div>
+                  <div class="cl">Internal · Industrial design</div>
+                  <div class="ft"><span class="av"></span><span class="dd">30 Oct</span></div>
+                </div>
+                <div class="kb-card">
+                  <div class="nm">Packaging revision</div>
+                  <div class="cl">Godrej · Industrial design</div>
+                  <div class="ft"><span class="av"></span><span class="dd">4 Nov</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="kb-col">
+              <div class="kb-head"><span class="dot h"></span><span class="t">Active</span><span class="c">4</span></div>
+              <div class="kb-body">
+                <div class="kb-card">
+                  <div class="nm">Nova enclosure</div>
+                  <div class="cl">Zeta Labs · Engineering</div>
+                  <div class="ft"><span class="av"></span><span class="av"></span><span class="dd">2 Oct</span></div>
+                </div>
+                <div class="kb-card">
+                  <div class="nm">Pulse remote — DFM</div>
+                  <div class="cl">Zeta Labs · Engineering</div>
+                  <div class="ft"><span class="av"></span><span class="av"></span><span class="dd">14 Oct</span></div>
+                </div>
+                <div class="kb-card">
+                  <div class="nm">Q4 launch film</div>
+                  <div class="cl">Godrej · Marketing</div>
+                  <div class="ft"><span class="av"></span><span class="dd">10 Oct</span></div>
+                </div>
+                <div class="kb-card">
+                  <div class="nm">Website refresh</div>
+                  <div class="cl">Internal · Marketing</div>
+                  <div class="ft"><span class="av"></span><span class="av"></span><span class="dd">18 Oct</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="kb-col">
+              <div class="kb-head"><span class="dot"></span><span class="t">Blocked</span><span class="c">2</span></div>
+              <div class="kb-body">
+                <div class="kb-card">
+                  <div class="nm">Aster handle</div>
+                  <div class="cl">Godrej · Industrial design</div>
+                  <div class="ft"><span class="av"></span><span class="av"></span><span class="dd">26 Sep</span></div>
+                </div>
+                <div class="kb-card">
+                  <div class="nm">Vendor day — Pune</div>
+                  <div class="cl">Internal · Industrial design</div>
+                  <div class="ft"><span class="av"></span><span class="dd">28 Sep</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="kb-col">
+              <div class="kb-head"><span class="dot o"></span><span class="t">Done</span><span class="c">1</span></div>
+              <div class="kb-body">
+                <div class="kb-card">
+                  <div class="nm">Grip sleeve tooling</div>
+                  <div class="cl">Zeta Labs · Engineering</div>
+                  <div class="ft"><span class="av"></span><span class="dd">12 Sep</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ VENDORS ============ -->
+      <section class="page" id="vendors">
+        <div class="sec-head">
+          <h2>Vendors</h2>
+          <span class="note">68 · 12 used this quarter</span>
+          <span class="act" style="margin-left:auto">Add vendor</span>
+        </div>
+
+        <div class="filters">
+          <span class="fl on">Sheet metal<span class="caret"></span></span>
+          <span class="fl">City<span class="caret"></span></span>
+          <span class="fl">Price band<span class="caret"></span></span>
+          <span class="fl">Min quality<span class="caret"></span></span>
+          <span class="fl">Lead time<span class="caret"></span></span>
+        </div>
+
+        <div class="v-grid">
+          <div class="v-card">
+            <div class="top">
+              <div>
+                <div class="nm">Krishna Tools</div>
+                <div class="ct">Sheet metal, bending</div>
+              </div>
+              <div class="rate"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i></i></div>
+            </div>
+            <div class="v-meta">
+              <div><div class="k">Price band</div><div class="v">Cheap</div></div>
+              <div><div class="k">Lead time</div><div class="v">5 days</div></div>
+              <div><div class="k">City</div><div class="v">Peenya</div></div>
+              <div><div class="k">Min order</div><div class="v">₹8,000</div></div>
+            </div>
+            <div class="v-foot">
+              <span class="u">Last used by Ravi K. · Aug</span>
+              <span class="b">Open</span>
+            </div>
+          </div>
+
+          <div class="v-card">
+            <div class="top">
+              <div>
+                <div class="nm">Sundar Precision</div>
+                <div class="ct">Sheet metal, laser cut</div>
+              </div>
+              <div class="rate"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i></div>
+            </div>
+            <div class="v-meta">
+              <div><div class="k">Price band</div><div class="v">Premium</div></div>
+              <div><div class="k">Lead time</div><div class="v">3 days</div></div>
+              <div><div class="k">City</div><div class="v">Jigani</div></div>
+              <div><div class="k">Min order</div><div class="v">₹25,000</div></div>
+            </div>
+            <div class="v-foot">
+              <span class="u">Last used by Akash P. · Sep</span>
+              <span class="b">Open</span>
+            </div>
+          </div>
+
+          <div class="v-card">
+            <div class="top">
+              <div>
+                <div class="nm">Anand Fabrications</div>
+                <div class="ct">Sheet metal, welding</div>
+              </div>
+              <div class="rate"><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i></div>
+            </div>
+            <div class="v-meta">
+              <div><div class="k">Price band</div><div class="v">Mid</div></div>
+              <div><div class="k">Lead time</div><div class="v">8 days</div></div>
+              <div><div class="k">City</div><div class="v">Bommasandra</div></div>
+              <div><div class="k">Min order</div><div class="v">₹12,000</div></div>
+            </div>
+            <div class="v-foot">
+              <span class="u">Last used by Imran S. · Mar</span>
+              <span class="b">Open</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="sec" style="margin-top:24px">
+          <div class="sec-head"><h2>Full list</h2><span class="note">Sorted by quality</span></div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:24%">Vendor</th>
+                <th style="width:20%">Category</th>
+                <th style="width:12%">City</th>
+                <th style="width:12%">Price band</th>
+                <th style="width:10%">Quality</th>
+                <th style="width:10%">Lead time</th>
+                <th style="width:12%">Last used</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Sundar Precision</td><td>Sheet metal, laser cut</td><td>Jigani</td><td>Premium</td><td>5</td><td>3 days</td><td class="t-sub">Sep · Akash P.</td></tr>
+              <tr><td>Krishna Tools</td><td>Sheet metal, bending</td><td>Peenya</td><td>Cheap</td><td>4</td><td>5 days</td><td class="t-sub">Aug · Ravi K.</td></tr>
+              <tr><td>Meridian Moulds</td><td>Injection moulding</td><td>Hosur</td><td>Premium</td><td>5</td><td>21 days</td><td class="t-sub">Jul · Imran S.</td></tr>
+              <tr><td>Anand Fabrications</td><td>Sheet metal, welding</td><td>Bommasandra</td><td>Mid</td><td>3</td><td>8 days</td><td class="t-sub">Mar · Imran S.</td></tr>
+              <tr><td>Deccan Circuits</td><td>PCB assembly</td><td>Electronic City</td><td>Mid</td><td>4</td><td>12 days</td><td class="t-sub">Sep · Karthik R.</td></tr>
+            </tbody>
+          </table>
+          <div class="spacer"></div>
+        </div>
+      </section>
+
+      <!-- ============ STACK ============ -->
+      <section class="page" id="stack">
+        <div class="sec-head">
+          <h2>Software and keys</h2>
+          <span class="note">23 items · ₹61,400 per month</span>
+          <span class="act" style="margin-left:auto">Add item</span>
+        </div>
+
+        <div class="filters">
+          <span class="fl on">All<span class="caret"></span></span>
+          <span class="fl">Software</span>
+          <span class="fl">API keys</span>
+          <span class="fl">Owner<span class="caret"></span></span>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width:22%">Name</th>
+              <th style="width:22%">Used for</th>
+              <th style="width:14%">Owner</th>
+              <th style="width:10%">Cost</th>
+              <th style="width:12%">Renews</th>
+              <th style="width:20%">Credential</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Figma<div class="t-sub">Software · 9 seats</div></td>
+              <td>Design files, handoff</td><td>Sneha M.</td><td>₹4,800</td>
+              <td>25 Sep <div class="warn">in 6 days</div></td>
+              <td><span class="vault"><span class="lk"></span>Open in vault</span></td>
+            </tr>
+            <tr>
+              <td>Fusion 360<div class="t-sub">Software · 6 seats</div></td>
+              <td>CAD, engineering</td><td>Imran S.</td><td>₹32,000</td>
+              <td>14 Jan</td>
+              <td><span class="vault"><span class="lk"></span>Open in vault</span></td>
+            </tr>
+            <tr>
+              <td>OpenAI API<div class="t-sub">API key</div></td>
+              <td>Agent drafting, translation</td><td>Akash P.</td><td>₹6,200</td>
+              <td>Usage based</td>
+              <td><span class="masked">sk-••••••••••4f2a</span></td>
+            </tr>
+            <tr>
+              <td>Google Workspace<div class="t-sub">Software · 19 seats</div></td>
+              <td>Mail, drive, calendar</td><td>Founders</td><td>₹11,400</td>
+              <td>1 Oct</td>
+              <td><span class="vault"><span class="lk"></span>Open in vault</span></td>
+            </tr>
+            <tr>
+              <td>Razorpay<div class="t-sub">API key</div></td>
+              <td>Client invoicing</td><td>Founders</td><td>—</td>
+              <td>—</td>
+              <td><span class="masked">rzp_••••••••9c13</span></td>
+            </tr>
+            <tr>
+              <td>Netlify<div class="t-sub">Software</div></td>
+              <td>Site hosting</td><td>Karthik R.</td><td>₹1,600</td>
+              <td>8 Oct</td>
+              <td><span class="vault"><span class="lk"></span>Open in vault</span></td>
+            </tr>
+            <tr>
+              <td>Adobe CC<div class="t-sub">Software · 4 seats</div></td>
+              <td>Marketing assets</td><td>Sneha M.</td><td>₹5,400</td>
+              <td>19 Nov</td>
+              <td><span class="vault"><span class="lk"></span>Open in vault</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="spacer"></div>
+      </section>
+
+      <!-- ============ PEOPLE ============ -->
+      <section class="page" id="people">
+        <div class="sec-head">
+          <h2>People</h2>
+          <span class="note">19 · 3 out today</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width:26%">Name</th>
+              <th style="width:22%">Team</th>
+              <th style="width:20%">Status</th>
+              <th style="width:16%">Projects</th>
+              <th style="width:16%">Credits used</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Akash Pai</td><td>Industrial design</td><td><span class="chip"><span class="dot h"></span>In</span></td><td>4</td><td>18 of 30</td></tr>
+            <tr><td>Ravi K.</td><td>Industrial design</td><td><span class="chip"><span class="dot o"></span>Out to 23 Sep</span></td><td>3</td><td>9 of 30</td></tr>
+            <tr><td>Imran S.</td><td>Engineering</td><td><span class="chip"><span class="dot h"></span>Half day</span></td><td>5</td><td>24 of 30</td></tr>
+            <tr><td>Sneha M.</td><td>Marketing</td><td><span class="chip"><span class="dot o"></span>Out to 20 Sep</span></td><td>3</td><td>14 of 30</td></tr>
+            <tr><td>Karthik R.</td><td>Engineering</td><td><span class="chip"><span class="dot h"></span>In</span></td><td>2</td><td>11 of 30</td></tr>
+          </tbody>
+        </table>
+        <div class="spacer"></div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script>
+const titles={today:'Today',projects:'Projects',vendors:'Vendors',stack:'Stack',people:'People'};
+document.querySelectorAll('.nav button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    const id=b.dataset.go;
+    document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id===id));
+    document.getElementById('title').textContent=titles[id];
+    document.querySelector('.scroll').scrollTop=0;
+  });
+});
+document.querySelectorAll('.seg button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.seg button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    const board=b.dataset.view==='board';
+    document.getElementById('v-table').style.display=board?'none':'block';
+    document.getElementById('v-board').style.display=board?'block':'none';
+  });
+});
+</script>
+</body>
+</html>

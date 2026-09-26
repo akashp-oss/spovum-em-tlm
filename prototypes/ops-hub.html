@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ops hub — onboarding to dashboard</title>
+<style>
+:root{
+  --bg:#ffffff;--panel:#fafafa;--fg:#111111;--muted:#666666;
+  --faint:#999999;--line:#e0e0e0;--line-strong:#c8c8c8;--fill:#f2f2f2;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  font-size:14px;font-weight:400;line-height:1.5;-webkit-font-smoothing:antialiased;
+}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;text-align:left}
+input{font:inherit;color:inherit}
+.hide{display:none !important}
+
+/* ============ ONBOARDING ============ */
+#onb{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 24px}
+.ob{width:100%;max-width:480px}
+.ob-head{margin-bottom:24px}
+.ob-head .mark{width:24px;height:24px;border:1px solid var(--line-strong);margin-bottom:12px}
+.ob-head .t{font-size:15px;font-weight:500}
+.ob-head .s{font-size:13px;color:var(--faint)}
+
+.prog{display:flex;gap:4px;margin-bottom:24px}
+.prog i{flex:1;height:2px;background:var(--line);display:block}
+.prog i.on{background:var(--fg)}
+
+.chat{border:1px solid var(--line)}
+.chat-top{height:48px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 16px}
+.chat-top .av{width:24px;height:24px;border:1px solid var(--line-strong);border-radius:50%}
+.chat-top .n{font-size:14px}
+.chat-top .s{font-size:13px;color:var(--faint);margin-left:auto}
+.msgs{padding:16px;display:flex;flex-direction:column;gap:12px;min-height:320px;max-height:60vh;overflow-y:auto}
+.msg{max-width:90%}
+.msg .b{border:1px solid var(--line);padding:12px;font-size:14px;white-space:pre-line}
+.msg.me{align-self:flex-end}
+.msg.me .b{background:var(--fill)}
+
+.ctrl{border-top:1px solid var(--line);padding:16px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{border:1px solid var(--line);padding:10px 12px;font-size:14px;display:flex;align-items:center;gap:10px;width:100%;transition:border-color 150ms}
+.opt:hover{border-color:var(--line-strong)}
+.opt .bx{width:14px;height:14px;border:1px solid var(--line-strong);flex:0 0 14px}
+.opt .bx.rd{border-radius:50%}
+.opt.on{border-color:var(--line-strong)}
+.opt.on .bx{background:var(--fg);border-color:var(--fg)}
+.opt .sub{font-size:13px;color:var(--faint);margin-left:auto}
+.inline{display:flex;gap:8px;flex-wrap:wrap}
+.inline button{border:1px solid var(--line);padding:8px 12px;font-size:13px;transition:border-color 150ms}
+.inline button:hover{border-color:var(--line-strong)}
+.inline button.on{background:var(--fill);border-color:var(--line-strong)}
+.field{display:flex;gap:8px}
+.field input{flex:1;height:40px;border:1px solid var(--line);padding:0 12px;outline:none;background:var(--bg)}
+.field input:focus{border-color:var(--line-strong)}
+.field input::placeholder{color:var(--faint)}
+.btn{height:40px;padding:0 16px;border:1px solid var(--line-strong);font-size:14px;display:inline-flex;align-items:center;justify-content:center}
+.btn:hover{background:var(--fill)}
+.btn[disabled]{color:var(--faint);border-color:var(--line);cursor:default}
+.btn[disabled]:hover{background:none}
+.done-row{margin-top:12px;display:flex;align-items:center;gap:12px}
+.done-row .c{font-size:13px;color:var(--faint)}
+
+/* ============ APP ============ */
+.app{display:flex;height:100vh;overflow:hidden}
+.side{width:240px;flex:0 0 240px;border-right:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;padding:24px 0}
+.brand{padding:0 24px 24px;border-bottom:1px solid var(--line)}
+.brand .mark{width:24px;height:24px;border:1px solid var(--line-strong);margin-bottom:12px}
+.brand .name{font-size:15px;font-weight:500}
+.brand .sub{font-size:13px;color:var(--faint)}
+.nav{padding:16px 12px;display:flex;flex-direction:column;gap:2px}
+.nav-label{font-size:13px;color:var(--faint);padding:8px 12px 4px}
+.nav button{display:flex;align-items:center;gap:12px;width:100%;padding:8px 12px;font-size:14px;color:var(--muted)}
+.nav button .ico{width:16px;height:16px;border:1px solid var(--line-strong);flex:0 0 16px}
+.nav button.on{color:var(--fg);background:var(--fill)}
+.nav button .count{margin-left:auto;font-size:13px;color:var(--faint)}
+.me{margin-top:auto;padding:16px 24px 0;border-top:1px solid var(--line)}
+.me .row{display:flex;align-items:center;gap:12px}
+.me .av{width:32px;height:32px;border:1px solid var(--line-strong);border-radius:50%;flex:0 0 32px}
+.me .n{font-size:14px}
+.me .r{font-size:13px;color:var(--faint)}
+.me .redo{margin-top:12px;font-size:13px;color:var(--faint)}
+.me .redo:hover{color:var(--muted)}
+
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.top{height:64px;flex:0 0 64px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;padding:0 32px}
+.top h1{font-size:18px;font-weight:500}
+.search{margin-left:auto;width:320px;height:36px;border:1px solid var(--line);display:flex;align-items:center;gap:8px;padding:0 12px}
+.search .ico{width:14px;height:14px;border:1px solid var(--line-strong);border-radius:50%;flex:0 0 14px}
+.search input{border:none;outline:none;width:100%;font-size:14px;background:none}
+.search input::placeholder{color:var(--faint)}
+.scroll{flex:1;overflow-y:auto;padding:32px}
+.page{display:none}
+.page.on{display:block}
+
+.sec{margin-bottom:40px}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px}
+.sec-head h2{font-size:15px;font-weight:500}
+.sec-head .note{font-size:13px;color:var(--faint)}
+.sec-head .act{margin-left:auto;font-size:13px;color:var(--muted);border-bottom:1px solid var(--line-strong)}
+.card{border:1px solid var(--line);padding:16px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border:1px solid var(--line);font-size:13px;color:var(--muted)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--fg)}
+.dot.o{background:none;border:1px solid var(--line-strong)}
+.dot.h{background:var(--line-strong)}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:13px;font-weight:400;color:var(--faint);padding:8px 16px 8px 0;border-bottom:1px solid var(--line)}
+td{padding:12px 16px 12px 0;border-bottom:1px solid var(--line);font-size:14px;vertical-align:top}
+tr:hover td{background:var(--panel)}
+.t-sub{font-size:13px;color:var(--faint)}
+.spacer{height:16px}
+.bar{height:4px;background:var(--fill);width:100%}
+.bar span{display:block;height:100%;background:var(--line-strong)}
+.seg{display:flex;border:1px solid var(--line)}
+.seg button{padding:6px 12px;font-size:13px;color:var(--muted)}
+.seg button.on{background:var(--fill);color:var(--fg)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.fl{height:32px;padding:0 12px;border:1px solid var(--line);font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.fl.on{border-color:var(--line-strong);color:var(--fg)}
+.caret{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:4px solid var(--faint)}
+.out{display:flex;gap:8px;flex-wrap:wrap}
+.out .p{display:flex;align-items:center;gap:8px;border:1px solid var(--line);padding:8px 12px}
+.out .av{width:24px;height:24px;border:1px solid var(--line-strong);border-radius:50%}
+.out .d{font-size:13px;color:var(--faint)}
+.attn{border:1px solid var(--line)}
+.attn .r{display:flex;align-items:center;gap:16px;padding:16px;border-bottom:1px solid var(--line)}
+.attn .r:last-child{border-bottom:none}
+.attn .r:hover{background:var(--panel)}
+.attn .mk{width:8px;height:8px;border:1px solid var(--fg);flex:0 0 8px}
+.attn .mk.f{background:var(--fg)}
+.attn .why{font-size:13px;color:var(--faint)}
+.attn .go{margin-left:auto;font-size:13px;color:var(--muted)}
+.mine{border:1px solid var(--line)}
+.mine .r{display:grid;grid-template-columns:1fr 150px 100px 120px;gap:16px;align-items:center;padding:16px;border-bottom:1px solid var(--line)}
+.mine .r:last-child{border-bottom:none}
+.mine .r:hover{background:var(--panel)}
+.mine .cl{font-size:13px;color:var(--faint)}
+.empty{border:1px solid var(--line);padding:32px}
+.empty h4{font-size:15px;font-weight:500;margin-bottom:8px}
+.empty p{font-size:13px;color:var(--muted);max-width:440px}
+.kb{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:start}
+.kb-col{border:1px solid var(--line);background:var(--panel);min-height:280px}
+.kb-head{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.kb-head .t{font-size:13px}
+.kb-head .c{margin-left:auto;font-size:13px;color:var(--faint)}
+.kb-body{padding:8px;display:flex;flex-direction:column;gap:8px}
+.kb-card{border:1px solid var(--line);background:var(--bg);padding:12px}
+.kb-card .cl{font-size:13px;color:var(--faint);margin:4px 0 12px}
+.kb-card .ft{display:flex;align-items:center;gap:8px}
+.kb-card .av{width:20px;height:20px;border:1px solid var(--line-strong);border-radius:50%}
+.kb-card .av.you{background:var(--fill)}
+.kb-card .dd{font-size:13px;color:var(--faint);margin-left:auto}
+.v-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.v-card{border:1px solid var(--line);padding:16px}
+.v-card .vt{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.v-card .nm{font-size:15px;font-weight:500}
+.v-card .ct{font-size:13px;color:var(--faint)}
+.v-card .rate{margin-left:auto;display:flex;gap:2px}
+.v-card .rate i{width:8px;height:8px;border:1px solid var(--fg);display:block}
+.v-card .rate i.f{background:var(--fg)}
+.v-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-bottom:12px}
+.v-meta .k{font-size:13px;color:var(--faint)}
+.v-meta .v{font-size:13px}
+.v-foot{border-top:1px solid var(--line);padding-top:12px;display:flex;align-items:center;gap:8px}
+.v-foot .u{font-size:13px;color:var(--faint)}
+.v-foot .b{margin-left:auto;font-size:13px;border-bottom:1px solid var(--line-strong)}
+.vault{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);border:1px solid var(--line);height:28px;padding:0 10px}
+.vault .lk{width:10px;height:12px;border:1px solid var(--line-strong)}
+.masked{letter-spacing:2px;color:var(--faint);font-size:13px}
+.warn{font-size:13px;border-bottom:1px solid var(--fg);display:inline-block}
+.file{border:1px solid var(--line);background:var(--panel);padding:20px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.7;white-space:pre-wrap}
+.file .c{color:var(--faint)}
+.note{margin-top:16px;padding:16px;border:1px solid var(--line);font-size:13px;color:var(--muted)}
+.note b{font-weight:500;color:var(--fg)}
+</style>
+</head>
+<body>
+
+<!-- ==================== ONBOARDING ==================== -->
+<div id="onb">
+  <div class="ob">
+    <div class="ob-head">
+      <div class="mark"></div>
+      <div class="t">Ops hub</div>
+      <div class="s">Bang Design</div>
+    </div>
+    <div class="prog" id="prog"></div>
+    <div class="chat">
+      <div class="chat-top">
+        <span class="av"></span><span class="n">Ops assistant</span><span class="s" id="stepLbl"></span>
+      </div>
+      <div class="msgs" id="msgs"></div>
+      <div class="ctrl" id="ctrl"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== APP ==================== -->
+<div class="app hide" id="app">
+  <aside class="side">
+    <div class="brand">
+      <div class="mark"></div>
+      <div class="name">Ops hub</div>
+      <div class="sub">Bang Design</div>
+    </div>
+    <nav class="nav">
+      <button class="on" data-go="today"><span class="ico"></span>Today</button>
+      <button data-go="projects"><span class="ico"></span>Projects<span class="count">7</span></button>
+      <button data-go="vendors"><span class="ico"></span>Vendors<span class="count">68</span></button>
+      <button data-go="stack"><span class="ico"></span>Stack<span class="count">7</span></button>
+      <div class="nav-label">Team</div>
+      <button data-go="people"><span class="ico"></span>People<span class="count">5</span></button>
+      <button data-go="soul"><span class="ico"></span>My profile</button>
+    </nav>
+    <div class="me">
+      <div class="row">
+        <div class="av"></div>
+        <div>
+          <div class="n" id="meName">—</div>
+          <div class="r" id="meTeam">—</div>
+        </div>
+      </div>
+      <button class="redo" id="redo">Run onboarding again</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="top">
+      <h1 id="title">Today</h1>
+      <div class="search"><span class="ico"></span><input placeholder="Search projects, vendors, clients, keys"></div>
+    </header>
+    <div class="scroll" id="scroll">
+
+      <!-- TODAY -->
+      <section class="page on" id="today">
+        <div class="sec">
+          <div class="sec-head"><h2 id="greet">Today</h2><span class="note" id="dateLbl"></span></div>
+        </div>
+        <div class="sec">
+          <div class="sec-head"><h2>Who is out</h2><span class="note">2 people</span></div>
+          <div class="out">
+            <div class="p"><span class="av"></span><span>Ravi K.</span><span class="d">back Mon 23</span></div>
+            <div class="p"><span class="av"></span><span>Sneha M.</span><span class="d">back tomorrow</span></div>
+          </div>
+        </div>
+        <div class="sec">
+          <div class="sec-head"><h2>Needs attention</h2><span class="note" id="attnCount"></span></div>
+          <div id="attnWrap"></div>
+        </div>
+        <div class="sec">
+          <div class="sec-head"><h2>My projects</h2><span class="note" id="mineCount"></span></div>
+          <div id="mineWrap"></div>
+        </div>
+        <div class="sec">
+          <div class="sec-head"><h2>My credits this month</h2><span class="note" id="credLbl"></span></div>
+          <div class="card">
+            <div class="bar" style="margin-bottom:12px"><span id="credBar"></span></div>
+            <div style="display:flex;gap:24px;flex-wrap:wrap" id="credSplit"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROJECTS -->
+      <section class="page" id="projects">
+        <div class="sec-head">
+          <h2>All projects</h2><span class="note" id="projNote"></span>
+          <span style="margin-left:auto" class="seg">
+            <button class="on" data-view="table">Table</button>
+            <button data-view="board">Board</button>
+          </span>
+        </div>
+        <div class="filters">
+          <span class="fl on">All teams<span class="caret"></span></span>
+          <span class="fl">Owner<span class="caret"></span></span>
+          <span class="fl">Client<span class="caret"></span></span>
+          <span class="fl">Status<span class="caret"></span></span>
+        </div>
+        <div id="v-table">
+          <table>
+            <thead><tr>
+              <th style="width:26%">Project</th><th style="width:14%">Client</th>
+              <th style="width:14%">Owner</th><th style="width:14%">Sub-owner</th>
+              <th style="width:12%">Status</th><th style="width:10%">Due</th><th style="width:10%">Last update</th>
+            </tr></thead>
+            <tbody id="projRows"></tbody>
+          </table>
+          <div class="spacer"></div>
+        </div>
+        <div id="v-board" class="hide"><div class="kb" id="kb"></div></div>
+      </section>
+
+      <!-- VENDORS -->
+      <section class="page" id="vendors">
+        <div class="sec-head"><h2>Vendors</h2><span class="note">68 · 12 used this quarter</span><span class="act">Add vendor</span></div>
+        <div class="filters">
+          <span class="fl on">Sheet metal<span class="caret"></span></span>
+          <span class="fl">City<span class="caret"></span></span>
+          <span class="fl">Price band<span class="caret"></span></span>
+          <span class="fl">Min quality<span class="caret"></span></span>
+          <span class="fl">Lead time<span class="caret"></span></span>
+        </div>
+        <div class="v-grid" id="vCards"></div>
+        <div class="spacer"></div>
+        <div class="sec" style="margin-top:24px">
+          <div class="sec-head"><h2>Full list</h2><span class="note">Sorted by quality</span></div>
+          <table>
+            <thead><tr>
+              <th style="width:24%">Vendor</th><th style="width:20%">Category</th><th style="width:12%">City</th>
+              <th style="width:12%">Price band</th><th style="width:10%">Quality</th>
+              <th style="width:10%">Lead time</th><th style="width:12%">Last used</th>
+            </tr></thead>
+            <tbody id="vRows"></tbody>
+          </table>
+          <div class="spacer"></div>
+        </div>
+      </section>
+
+      <!-- STACK -->
+      <section class="page" id="stack">
+        <div class="sec-head"><h2>Software and keys</h2><span class="note">7 items · ₹61,400 per month</span><span class="act">Add item</span></div>
+        <div class="filters">
+          <span class="fl on">All<span class="caret"></span></span>
+          <span class="fl">Software</span><span class="fl">API keys</span>
+          <span class="fl">Owner<span class="caret"></span></span>
+        </div>
+        <table>
+          <thead><tr>
+            <th style="width:22%">Name</th><th style="width:22%">Used for</th><th style="width:14%">Owner</th>
+            <th style="width:10%">Cost</th><th style="width:12%">Renews</th><th style="width:20%">Credential</th>
+          </tr></thead>
+          <tbody id="stackRows"></tbody>
+        </table>
+        <div class="spacer"></div>
+      </section>
+
+      <!-- PEOPLE -->
+      <section class="page" id="people">
+        <div class="sec-head"><h2>People</h2><span class="note">5 · 2 out today</span></div>
+        <table>
+          <thead><tr>
+            <th style="width:26%">Name</th><th style="width:22%">Team</th><th style="width:20%">Status</th>
+            <th style="width:16%">Projects</th><th style="width:16%">Credits used</th>
+          </tr></thead>
+          <tbody id="peopleRows"></tbody>
+        </table>
+        <div class="spacer"></div>
+      </section>
+
+      <!-- SOUL -->
+      <section class="page" id="soul">
+        <div class="sec-head"><h2>My profile</h2><span class="note">soul.md · what the assistant knows about you</span></div>
+        <div class="file" id="soulFile"></div>
+        <div class="note">
+          <b>Everything above came from your six onboarding answers.</b> Identity and working style are yours to edit. Current context syncs from the database. The assistant appends to Learned over time, and you can delete any line you disagree with. Nothing about timing, presence or behaviour is ever written here.
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script>
+/* ==================== DATA ==================== */
+const DB = {
+  projects:[
+    {id:'p1',name:'Aster handle',client:'Godrej',team:'Industrial design',owner:'Akash P.',sub:'Ravi K.',status:'Blocked',due:'26 Sep',upd:'4d ago',stale:4},
+    {id:'p2',name:'Nova enclosure',client:'Zeta Labs',team:'Engineering',owner:'Akash P.',sub:'Imran S.',status:'Active',due:'2 Oct',upd:'Today',stale:0},
+    {id:'p3',name:'Pulse remote — DFM',client:'Zeta Labs',team:'Engineering',owner:'Imran S.',sub:'Akash P.',status:'Active',due:'14 Oct',upd:'2d ago',stale:2},
+    {id:'p4',name:'Q4 launch film',client:'Godrej',team:'Marketing',owner:'Sneha M.',sub:'—',status:'Active',due:'10 Oct',upd:'Yesterday',stale:1},
+    {id:'p5',name:'Vendor day — Pune',client:'Internal',team:'Industrial design',owner:'Ravi K.',sub:'—',status:'Waiting on vendor',due:'28 Sep',upd:'6d ago',stale:6},
+    {id:'p6',name:'Clip mechanism study',client:'Internal',team:'Industrial design',owner:'Akash P.',sub:'—',status:'Not started',due:'30 Oct',upd:'—',stale:99},
+    {id:'p7',name:'Website refresh',client:'Internal',team:'Marketing',owner:'Sneha M.',sub:'Karthik R.',status:'Active',due:'18 Oct',upd:'3d ago',stale:3}
+  ],
+  vendors:[
+    {n:'Sundar Precision',c:'Sheet metal, laser cut',city:'Jigani',band:'Premium',q:5,lead:'3 days',min:'₹25,000',used:'Sep · Akash P.'},
+    {n:'Krishna Tools',c:'Sheet metal, bending',city:'Peenya',band:'Cheap',q:4,lead:'5 days',min:'₹8,000',used:'Aug · Ravi K.'},
+    {n:'Meridian Moulds',c:'Injection moulding',city:'Hosur',band:'Premium',q:5,lead:'21 days',min:'₹60,000',used:'Jul · Imran S.'},
+    {n:'Anand Fabrications',c:'Sheet metal, welding',city:'Bommasandra',band:'Mid',q:3,lead:'8 days',min:'₹12,000',used:'Mar · Imran S.'},
+    {n:'Deccan Circuits',c:'PCB assembly',city:'Electronic City',band:'Mid',q:4,lead:'12 days',min:'₹18,000',used:'Sep · Karthik R.'}
+  ],
+  stack:[
+    {n:'Figma',t:'Software · 9 seats',u:'Design files, handoff',o:'Sneha M.',c:'₹4,800',r:'25 Sep',warn:'in 6 days',vault:true},
+    {n:'Fusion 360',t:'Software · 6 seats',u:'CAD, engineering',o:'Imran S.',c:'₹32,000',r:'14 Jan',vault:true},
+    {n:'OpenAI API',t:'API key',u:'Agent drafting, translation',o:'Akash P.',c:'₹6,200',r:'Usage based',key:'sk-••••••••••4f2a'},
+    {n:'Google Workspace',t:'Software · 19 seats',u:'Mail, drive, calendar',o:'Founders',c:'₹11,400',r:'1 Oct',vault:true},
+    {n:'Razorpay',t:'API key',u:'Client invoicing',o:'Founders',c:'—',r:'—',key:'rzp_••••••••9c13'},
+    {n:'Netlify',t:'Software',u:'Site hosting',o:'Karthik R.',c:'₹1,600',r:'8 Oct',vault:true},
+    {n:'Adobe CC',t:'Software · 4 seats',u:'Marketing assets',o:'Sneha M.',c:'₹5,400',r:'19 Nov',vault:true}
+  ],
+  people:[
+    {n:'Ravi K.',t:'Industrial design',s:'Out to 23 Sep',out:true,p:3,cr:9},
+    {n:'Imran S.',t:'Engineering',s:'In',out:false,p:5,cr:24},
+    {n:'Sneha M.',t:'Marketing',s:'Out to 20 Sep',out:true,p:3,cr:14},
+    {n:'Karthik R.',t:'Engineering',s:'In',out:false,p:2,cr:11}
+  ]
+};
+
+/* ==================== STATE ==================== */
+const S = {name:'',team:'',role:'',hours:'',weekly:'',nudge:'',picked:[],owns:[]};
+
+/* ==================== ONBOARDING ==================== */
+const msgs=document.getElementById('msgs'), ctrl=document.getElementById('ctrl');
+const prog=document.getElementById('prog'), stepLbl=document.getElementById('stepLbl');
+let step=0;
+const TOTAL=7;
+
+function bot(t){const d=document.createElement('div');d.className='msg';d.innerHTML='<div class="b">'+t+'</div>';msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight}
+function me(t){const d=document.createElement('div');d.className='msg me';d.innerHTML='<div class="b">'+t+'</div>';msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight}
+function drawProg(){prog.innerHTML='';for(let i=0;i<TOTAL;i++){const s=document.createElement('i');if(i<=step)s.className='on';prog.appendChild(s)}stepLbl.textContent=step<TOTAL?('step '+(step+1)+' of '+TOTAL):'done'}
+
+function textStep(ph,cb){
+  ctrl.innerHTML='<div class="field"><input id="ti" placeholder="'+ph+'" autocomplete="off"><button class="btn" id="tb">Send</button></div>';
+  const ti=document.getElementById('ti'), tb=document.getElementById('tb');
+  ti.focus();
+  const go=()=>{const v=ti.value.trim();if(!v)return;me(v);cb(v)};
+  tb.onclick=go; ti.onkeydown=e=>{if(e.key==='Enter')go()};
+}
+function pickStep(list,cb,radio){
+  ctrl.innerHTML='<div class="opts">'+list.map((o,i)=>
+    '<button class="opt" data-i="'+i+'"><span class="bx '+(radio?'rd':'')+'"></span>'+o.l+
+    (o.s?'<span class="sub">'+o.s+'</span>':'')+'</button>').join('')+'</div>';
+  ctrl.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{me(list[b.dataset.i].l);cb(list[b.dataset.i])});
+}
+function chipStep(list,cb){
+  ctrl.innerHTML='<div class="inline">'+list.map((o,i)=>'<button data-i="'+i+'">'+o+'</button>').join('')+'</div>';
+  ctrl.querySelectorAll('button').forEach(b=>b.onclick=()=>{me(list[b.dataset.i]);cb(list[b.dataset.i])});
+}
+function multiStep(list,cb){
+  ctrl.innerHTML='<div class="opts">'+list.map((o,i)=>
+    '<button class="opt" data-i="'+i+'"><span class="bx"></span>'+o.l+(o.s?'<span class="sub">'+o.s+'</span>':'')+'</button>').join('')+
+    '</div><div class="done-row"><button class="btn" id="mdone" disabled>Done</button><span class="c" id="mc">nothing picked yet</span></div>';
+  const sel=new Set(), mdone=document.getElementById('mdone'), mc=document.getElementById('mc');
+  ctrl.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i; sel.has(i)?sel.delete(i):sel.add(i); b.classList.toggle('on');
+    mdone.disabled=sel.size===0;
+    mc.textContent=sel.size===0?'nothing picked yet':(sel.size+' picked');
+  });
+  mdone.onclick=()=>{if(!sel.size)return;const a=[...sel].map(i=>list[i]);me(a.map(x=>x.l).join(', '));cb(a)};
+}
+
+function run(){
+  drawProg();
+  if(step===0){
+    bot("Hi. I am your assistant at Bang Design.\n\nI keep track of your projects so you do not have to fill in sheets. I can also draft mails, make decks and log your leave.\n\nSix quick questions and we are done.");
+    pickStep([{l:'Start'}],()=>{step=1;next()},true);
+  }
+}
+function next(){
+  drawProg();
+  if(step===1){
+    bot("What should I call you?");
+    textStep('Your name',v=>{S.name=v;bot("Got it, "+v+".");step=2;next()});
+  }
+  else if(step===2){
+    bot("Which team are you on?");
+    pickStep([{l:'Industrial design'},{l:'Engineering'},{l:'Marketing'}],o=>{
+      S.team=o.l;
+      bot("And what do you mostly do? One line is enough.");
+      textStep('e.g. DFM and tooling coordination',v=>{S.role=v;step=3;next()});
+    },true);
+  }
+  else if(step===3){
+    bot("When are you usually working? I will never message you outside this.");
+    chipStep(['Before 10','10 to 7','Flexible','Shift work'],v=>{
+      S.hours=v;
+      bot("Roughly how many hours a week do you give?");
+      chipStep(['Under 20','20 to 35','40','More than 40'],w=>{S.weekly=w;step=4;next()});
+    });
+  }
+  else if(step===4){
+    bot("How often should I check in with you?");
+    pickStep([
+      {l:'Only when something is overdue',s:'rare'},
+      {l:'When something needs me',s:'default'},
+      {l:'Short check every morning',s:'daily'}
+    ],o=>{
+      S.nudge=o.l;
+      bot("You can change this any time by telling me \"message me less\".");
+      step=5;next();
+    },true);
+  }
+  else if(step===5){
+    bot("Which of these are you working on? Pick all that apply.");
+    multiStep(DB.projects.map(p=>({l:p.name,s:p.client,id:p.id})),a=>{
+      S.picked=a.map(x=>x.id);
+      step=6;next();
+    });
+  }
+  else if(step===6){
+    const first=DB.projects.find(p=>p.id===S.picked[0]);
+    bot("Last one. On "+first.name+", are you the owner or helping out?");
+    pickStep([{l:'I own it'},{l:'I am sub-owner'},{l:'Just helping'}],o=>{
+      if(o.l==='I own it')S.owns=[first.id];
+      finish();
+    },true);
+  }
+}
+function finish(){
+  drawProg();
+  const mine=DB.projects.filter(p=>S.picked.includes(p.id));
+  bot("Done, "+S.name+". Here is where you stand.\n\n"+
+      mine.map(p=>p.name+" — due "+p.due+(S.owns.includes(p.id)?", you own it":"")).join("\n")+
+      "\n\nTwo people are out today: Ravi and Sneha.");
+  ctrl.innerHTML='<button class="btn" id="goapp" style="width:100%">Open the dashboard</button>';
+  document.getElementById('goapp').onclick=()=>{boot();};
+}
+
+/* ==================== RENDER APP ==================== */
+function statusChip(s){
+  const d = s==='Blocked'||s==='Waiting on vendor' ? '<span class="dot"></span>'
+          : s==='Not started' ? '<span class="dot o"></span>'
+          : '<span class="dot h"></span>';
+  return '<span class="chip">'+d+s+'</span>';
+}
+function boot(){
+  const me_ = S.name || 'You';
+  const mine = DB.projects.filter(p=>S.picked.includes(p.id));
+
+  // rewrite ownership from onboarding
+  DB.projects.forEach(p=>{
+    if(S.owns.includes(p.id)) p.owner = me_;
+    else if(S.picked.includes(p.id) && p.sub==='—') p.sub = me_;
+    else if(S.picked.includes(p.id)) p.sub = me_;
+  });
+
+  document.getElementById('meName').textContent = me_;
+  document.getElementById('meTeam').textContent = S.team;
+  document.getElementById('greet').textContent = 'Good morning, '+me_;
+  document.getElementById('dateLbl').textContent = S.role;
+
+  // attention — only items touching this person
+  const attn = [];
+  mine.forEach(p=>{
+    if(p.status==='Blocked') attn.push({f:true,t:p.name+' — blocked '+p.stale+' days',w:(S.owns.includes(p.id)?'you own it':'you are on it')+' · client '+p.client});
+    else if(p.stale>=5) attn.push({f:false,t:p.name+' — no update in '+p.stale+' days',w:'due '+p.due});
+  });
+  if(S.team==='Marketing') attn.push({f:false,t:'Figma renews in 6 days — ₹4,800',w:'Owner Sneha M. · your team'});
+  const aw=document.getElementById('attnWrap');
+  if(attn.length){
+    aw.innerHTML='<div class="attn">'+attn.map(a=>
+      '<div class="r"><span class="mk '+(a.f?'f':'')+'"></span><div><div>'+a.t+'</div><div class="why">'+a.w+'</div></div><span class="go">Open</span></div>').join('')+'</div>';
+    document.getElementById('attnCount').textContent=attn.length+' items';
+  } else {
+    aw.innerHTML='<div class="empty"><h4>Nothing needs you right now</h4><p>Overdue work, blocked projects and renewals coming up will appear here. Empty is the goal.</p></div>';
+    document.getElementById('attnCount').textContent='clear';
+  }
+
+  // my projects
+  document.getElementById('mineWrap').innerHTML='<div class="mine">'+mine.map(p=>
+    '<div class="r"><div><div>'+p.name+(S.owns.includes(p.id)?'':'')+'</div><div class="cl">'+p.client+
+    (S.owns.includes(p.id)?' · you own it':'')+'</div></div>'+statusChip(p.status)+
+    '<span class="t-sub">Due '+p.due+'</span><span class="t-sub">Updated '+p.upd+'</span></div>').join('')+'</div>';
+  document.getElementById('mineCount').textContent=mine.length+' picked at onboarding';
+
+  // credits — scaled by declared weekly hours
+  const cap = S.weekly==='Under 20'?15 : S.weekly==='20 to 35'?24 : S.weekly==='40'?30 : 36;
+  const per = mine.map((p,i)=>({n:p.name,v:[8,6,4,3,2,2,1][i]||1}));
+  const used = per.reduce((a,b)=>a+b.v,0);
+  document.getElementById('credLbl').textContent=used+' of '+cap+' used · based on '+S.weekly.toLowerCase()+' hours a week';
+  document.getElementById('credBar').style.width=Math.min(100,used/cap*100)+'%';
+  document.getElementById('credSplit').innerHTML=per.map(x=>'<span class="t-sub">'+x.n+' · '+x.v+'</span>').join('')+
+    '<span class="t-sub" style="margin-left:auto">'+Math.max(0,cap-used)+' left</span>';
+
+  // projects table
+  document.getElementById('projRows').innerHTML=DB.projects.map(p=>
+    '<tr><td>'+p.name+'<div class="t-sub">'+p.team+'</div></td><td>'+p.client+'</td><td>'+p.owner+
+    '</td><td>'+p.sub+'</td><td>'+statusChip(p.status)+'</td><td>'+p.due+'</td><td class="t-sub">'+p.upd+'</td></tr>').join('');
+  document.getElementById('projNote').textContent=DB.projects.length+' total · '+mine.length+' yours';
+
+  // board
+  const cols=[['Not started','o'],['Active','h'],['Blocked',''],['Waiting on vendor','']];
+  document.getElementById('kb').innerHTML=cols.map(([c,d])=>{
+    const items=DB.projects.filter(p=>p.status===c);
+    return '<div class="kb-col"><div class="kb-head"><span class="dot '+d+'"></span><span class="t">'+c+
+      '</span><span class="c">'+items.length+'</span></div><div class="kb-body">'+
+      items.map(p=>'<div class="kb-card"><div>'+p.name+'</div><div class="cl">'+p.client+' · '+p.team+
+      '</div><div class="ft"><span class="av'+(S.picked.includes(p.id)?' you':'')+'"></span>'+
+      (p.sub!=='—'?'<span class="av"></span>':'')+'<span class="dd">'+p.due+'</span></div></div>').join('')+
+      '</div></div>';
+  }).join('');
+
+  // vendors
+  document.getElementById('vCards').innerHTML=DB.vendors.slice(0,3).map(v=>
+    '<div class="v-card"><div class="vt"><div><div class="nm">'+v.n+'</div><div class="ct">'+v.c+'</div></div>'+
+    '<div class="rate">'+[1,2,3,4,5].map(i=>'<i class="'+(i<=v.q?'f':'')+'"></i>').join('')+'</div></div>'+
+    '<div class="v-meta"><div><div class="k">Price band</div><div class="v">'+v.band+'</div></div>'+
+    '<div><div class="k">Lead time</div><div class="v">'+v.lead+'</div></div>'+
+    '<div><div class="k">City</div><div class="v">'+v.city+'</div></div>'+
+    '<div><div class="k">Min order</div><div class="v">'+v.min+'</div></div></div>'+
+    '<div class="v-foot"><span class="u">Last used '+v.used+'</span><span class="b">Open</span></div></div>').join('');
+  document.getElementById('vRows').innerHTML=DB.vendors.map(v=>
+    '<tr><td>'+v.n+'</td><td>'+v.c+'</td><td>'+v.city+'</td><td>'+v.band+'</td><td>'+v.q+'</td><td>'+v.lead+
+    '</td><td class="t-sub">'+v.used+'</td></tr>').join('');
+
+  // stack
+  document.getElementById('stackRows').innerHTML=DB.stack.map(s=>
+    '<tr><td>'+s.n+'<div class="t-sub">'+s.t+'</div></td><td>'+s.u+'</td><td>'+s.o+'</td><td>'+s.c+'</td>'+
+    '<td>'+s.r+(s.warn?'<div class="warn">'+s.warn+'</div>':'')+'</td>'+
+    '<td>'+(s.vault?'<span class="vault"><span class="lk"></span>Open in vault</span>':'<span class="masked">'+s.key+'</span>')+'</td></tr>').join('');
+
+  // people — you first
+  const rows=[{n:me_+' (you)',t:S.team,s:'In',out:false,p:mine.length,cr:used,cap:cap}].concat(DB.people);
+  document.getElementById('peopleRows').innerHTML=rows.map(p=>
+    '<tr><td>'+p.n+'</td><td>'+p.t+'</td><td><span class="chip"><span class="dot '+(p.out?'o':'h')+'"></span>'+p.s+
+    '</span></td><td>'+p.p+'</td><td>'+p.cr+' of '+(p.cap||30)+'</td></tr>').join('');
+
+  // soul.md
+  const ownNames = DB.projects.filter(p=>S.owns.includes(p.id)).map(p=>p.name);
+  document.getElementById('soulFile').innerHTML =
+'<span class="c"># '+me_+' — soul.md</span>\n\n'+
+'<span class="c">## Identity</span>          <span class="c">← from onboarding, you can edit</span>\n'+
+'name: '+me_+'\n'+
+'team: '+S.team.toLowerCase()+'\n'+
+'role: '+S.role+'\n\n'+
+'<span class="c">## Working style</span>     <span class="c">← from onboarding, you can edit</span>\n'+
+'peak_hours: '+S.hours+'\n'+
+'weekly_hours: '+S.weekly+'\n'+
+'nudge_tolerance: '+S.nudge+'\n\n'+
+'<span class="c">## Current context</span>   <span class="c">← synced from database</span>\n'+
+'projects: ['+mine.map(p=>p.name).join(', ')+']\n'+
+'owns: ['+(ownNames.join(', ')||'none yet')+']\n'+
+'credits_this_month: '+used+' of '+cap+'\n\n'+
+'<span class="c">## Learned</span>           <span class="c">← agent appends, you can delete any line</span>\n'+
+'<span class="c">(nothing yet — this fills in as you work)</span>';
+
+  document.getElementById('onb').classList.add('hide');
+  document.getElementById('app').classList.remove('hide');
+}
+
+/* nav */
+const titles={today:'Today',projects:'Projects',vendors:'Vendors',stack:'Stack',people:'People',soul:'My profile'};
+document.querySelectorAll('.nav button[data-go]').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.nav button[data-go]').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id===b.dataset.go));
+  document.getElementById('title').textContent=titles[b.dataset.go];
+  document.getElementById('scroll').scrollTop=0;
+});
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.seg button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  const board=b.dataset.view==='board';
+  document.getElementById('v-table').classList.toggle('hide',board);
+  document.getElementById('v-board').classList.toggle('hide',!board);
+});
+document.getElementById('redo').onclick=()=>location.reload();
+
+run();
+</script>
+</body>
+</html>

@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vendor Drive</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#eef1f6;color:#1f2733;min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased}
+a{color:#2563eb;text-decoration:none}a:hover{text-decoration:underline}
+.card{background:#fff;border-radius:12px;padding:16px;border:1px solid #e4e8ef;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.btn{background:#2563eb;border:none;border-radius:8px;padding:9px 16px;color:#fff;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn:hover{background:#1d4fd7}.btn:disabled{opacity:.55;cursor:wait}
+.btn-sm{background:#f1f4f9;border:1px solid #e4e8ef;border-radius:7px;padding:6px 10px;color:#475467;font-size:12px;cursor:pointer;font-family:inherit;line-height:1}
+.btn-sm:hover{background:#e7ecf3;color:#1f2733}
+.btn-ghost{background:#fff;border:1px solid #d5dbe4;border-radius:8px;padding:9px 15px;color:#344054;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-ghost:hover{border-color:#2563eb;color:#2563eb}
+.btn-red{background:#fee2e2;color:#b42318;border:1px solid #fecaca}.btn-red:hover{background:#fecaca}
+.inp{background:#fff;border:1px solid #d5dbe4;border-radius:8px;padding:10px 12px;color:#1f2733;font-size:14px;outline:none;width:100%;font-family:inherit}
+.inp:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+textarea.inp{resize:vertical}
+select.inp{appearance:auto}
+.tag{background:#eff4ff;border-radius:5px;padding:2px 8px;font-size:10.5px;color:#3538cd;display:inline-block;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.tiny{display:block;font-size:11px;color:#667085;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.muted{color:#667085;font-size:12.5px}
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);padding:10px 18px;border-radius:10px;font-size:13.5px;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(16,24,40,.18)}
+.toast-ok{background:#067647;color:#fff}.toast-err{background:#d92d20;color:#fff}
+.tabs{display:flex;gap:4px;padding:8px 20px 0;border-bottom:1px solid #e4e8ef;overflow-x:auto;background:#fff}
+.tab{border:none;border-bottom:2px solid transparent;padding:9px 12px 10px;font-size:14px;cursor:pointer;white-space:nowrap;color:#667085;background:transparent;font-family:inherit;display:flex;align-items:center;gap:7px;font-weight:500}
+.tab:hover{color:#1f2733}
+.tab.active{color:#2563eb;border-bottom-color:#2563eb;font-weight:600}
+.badge{background:#2563eb;color:#fff;border-radius:10px;padding:0 6px;font-size:10px;font-weight:700;min-width:16px;text-align:center}
+#app{max-width:980px;margin:0 auto}
+.content{padding:18px 20px 80px}
+.frow{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #e4e8ef;border-radius:10px;padding:12px 14px;margin-bottom:8px;transition:box-shadow .12s,border-color .12s}
+.frow:hover{border-color:#c9d3e0;box-shadow:0 2px 8px rgba(16,24,40,.07)}
+.ficon{width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;letter-spacing:.02em}
+.fname{font-weight:600;font-size:14.5px;color:#101828;word-break:break-word}
+.fmeta{color:#667085;font-size:12.5px;margin-top:3px}
+.folder-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:11px;margin-bottom:22px}
+.folder-card{background:#fff;border:1px solid #e4e8ef;border-radius:12px;padding:15px 15px 14px;cursor:pointer;text-align:left;transition:box-shadow .12s,border-color .12s}
+.folder-card:hover{border-color:#2563eb;box-shadow:0 3px 12px rgba(37,99,235,.1)}
+.snip{font-size:12px;color:#475467;background:#f7f9fc;border:1px solid #eef1f6;border-radius:8px;padding:9px 11px;margin-top:8px;white-space:pre-wrap;font-family:ui-monospace,'SFMono-Regular',monospace;line-height:1.55;max-height:130px;overflow:auto}
+.modal-bg{position:fixed;inset:0;background:rgba(16,24,40,.45);z-index:1000;display:flex;align-items:flex-start;justify-content:center;padding:34px 14px;overflow:auto}
+.modal{background:#fff;border:1px solid #e4e8ef;border-radius:16px;max-width:860px;width:100%;padding:22px;box-shadow:0 20px 60px rgba(16,24,40,.25)}
+.answer{white-space:pre-wrap;line-height:1.65;font-size:14px;color:#1f2733}
+.chip{display:inline-flex;align-items:center;gap:5px;background:#f1f4f9;border:1px solid #e4e8ef;border-radius:20px;padding:5px 12px;font-size:12.5px;cursor:pointer;margin:4px 5px 0 0;color:#2563eb;font-weight:500}
+.chip:hover{border-color:#2563eb;background:#eff4ff}
+.ptable{width:100%;border-collapse:collapse;font-size:13px}
+.ptable th{background:#f7f9fc;color:#475467;text-align:left;padding:8px 11px;position:sticky;top:0;border-bottom:1px solid #e4e8ef;white-space:nowrap;font-weight:600}
+.ptable td{padding:7px 11px;border-bottom:1px solid #eef1f6;color:#1f2733;vertical-align:top}
+/* read cells: show the FULL text, wrapped, no cursor needed */
+.ptable td .rcell{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;line-height:1.5;min-width:70px;max-width:340px}
+.ptable tr:hover td{background:#f9fbfe}
+/* edit cells: a wrapping box that grows with its text */
+.cellinp{width:100%;min-width:120px;box-sizing:border-box;border:1px solid #d5deeb;border-radius:6px;padding:5px 7px;font:inherit;font-size:13px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;resize:vertical;background:#fff;color:#1f2733}
+.cellinp:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 2px rgba(37,99,235,.15)}
+.login-box{max-width:380px;margin:12vh auto;padding:34px;background:#fff}
+.seg{display:flex;background:#f1f4f9;border:1px solid #e4e8ef;border-radius:9px;padding:3px;gap:3px}
+.seg button{flex:1;border:none;background:transparent;color:#475467;padding:8px;border-radius:6px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit}
+.seg button.on{background:#2563eb;color:#fff}
+.drop{position:absolute;right:0;top:110%;background:#fff;border:1px solid #e4e8ef;border-radius:10px;padding:6px;min-width:210px;z-index:60;box-shadow:0 12px 32px rgba(16,24,40,.16)}
+.drop-item{display:block;width:100%;text-align:left;padding:8px 11px;border:none;color:#344054;border-radius:7px;cursor:pointer;font-size:13px;background:transparent;font-family:inherit}
+.drop-item:hover,.drop-item.on{background:#f1f4f9}
+kbd{background:#f1f4f9;border:1px solid #e4e8ef;border-radius:4px;padding:1px 6px;font-size:11px;font-family:ui-monospace,monospace}
+.spinner{width:18px;height:18px;border:2px solid #cfe0ff;border-top-color:#2563eb;border-radius:50%;display:inline-block;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.spinner{animation:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<input type="file" id="fileInput" multiple style="display:none">
+<script>
+// ── API ──────────────────────────────────────────────────────────
+const api = {
+  async req(path, opts = {}) {
+    const r = await fetch('/api' + path, { headers: { 'Content-Type': 'application/json' }, ...opts });
+    if (r.status === 401) { state.authed = false; render(); throw new Error('Not logged in'); }
+    if (!r.ok) { const b = await r.json().catch(() => ({})); throw new Error(b.detail || ('Error ' + r.status)); }
+    return r.json();
+  },
+  check: () => api.req('/check'),
+  accounts: () => api.req('/accounts'),
+  login: (name, pw) => api.req('/login', { method: 'POST', body: JSON.stringify({ name, password: pw }) }),
+  stats: () => api.req('/stats'),
+  folders: () => api.req('/folders'),
+  createFolder: (name) => api.req('/folders', { method: 'POST', body: JSON.stringify({ name }) }),
+  deleteFolder: (id) => api.req('/folders/' + id, { method: 'DELETE' }),
+  files: (folderId, q) => api.req('/files?folder_id=' + encodeURIComponent(folderId || '') + (q ? '&q=' + encodeURIComponent(q) : '')),
+  preview: (fid) => api.req('/files/' + fid + '/preview'),
+  moveFile: (fid, folderId) => api.req('/files/' + fid + '/move', { method: 'PUT', body: JSON.stringify({ folder_id: folderId }) }),
+  addRow: (fid, values) => api.req('/files/' + fid + '/row', { method: 'POST', body: JSON.stringify({ values }) }),
+  saveTable: (fid, headers, rows) => api.req('/files/' + fid + '/table', { method: 'PUT', body: JSON.stringify({ headers, rows }) }),
+  deleteFile: (fid) => api.req('/files/' + fid, { method: 'DELETE' }),
+  lockFile: (fid) => api.req('/files/' + fid + '/lock', { method: 'PUT', body: '{}' }),
+  lockFolder: (id) => api.req('/folders/' + id + '/lock', { method: 'PUT', body: '{}' }),
+  assistant: (message, context) => api.req('/assistant', { method: 'POST', body: JSON.stringify({ message, context: context || [] }) }),
+  history: () => api.req('/search/history'),
+  organize: () => api.req('/ai/organize', { method: 'POST', body: '{}' }),
+  team: () => api.req('/team'),
+  addMember: (d) => api.req('/team', { method: 'POST', body: JSON.stringify(d) }),
+  removeMember: (id) => api.req('/team/' + id, { method: 'DELETE' }),
+  changeMyPassword: (pw) => api.req('/me/password', { method: 'POST', body: JSON.stringify({ new_password: pw }) }),
+  ping: (d) => api.req('/ping', { method: 'POST', body: JSON.stringify(d) }),
+  notifications: (u) => api.req('/notifications?user=' + encodeURIComponent(u || '')),
+  markRead: (id) => api.req('/notifications/' + id + '/read', { method: 'PUT', body: '{}' }),
+  logout: () => api.req('/logout', { method: 'POST', body: '{}' }).catch(() => {}),
+  async upload(files, folderId) {
+    const fd = new FormData();
+    [...files].forEach(f => fd.append('files', f));
+    fd.append('folder_id', folderId || '');
+    const r = await fetch('/api/files/upload', { method: 'POST', body: fd });
+    if (!r.ok) { const b = await r.json().catch(() => ({})); throw new Error(b.detail || 'Upload failed'); }
+    return r.json();
+  },
+};
+
+// ── State ────────────────────────────────────────────────────────
+const state = {
+  authed: null, tab: 'drive', user: '', isAdmin: false, accounts: [], stats: null, showMenu: false, toast: null,
+  folders: [], rootCount: 0, curFolder: null, // null = root, else {id,name}
+  files: [], fileSearch: '', fileMatches: null,
+  searchMode: 'ai', searchQuery: '', searchResult: null, searchBusy: false, history: [],
+  team: [], notifications: [], modal: null,
+  chat: loadChat(),   // recent Q&A this device remembers, for follow-up context
+};
+
+// Lightweight local memory (this browser only). Safe: just conversation text.
+function loadChat() { try { return JSON.parse(localStorage.getItem('vd_chat') || '[]'); } catch { return []; } }
+function saveChat() { try { localStorage.setItem('vd_chat', JSON.stringify(state.chat.slice(-12))); } catch {} }
+
+function toast(msg, err) { state.toast = { msg, err }; render(); clearTimeout(toast._t); toast._t = setTimeout(() => { state.toast = null; render(); }, 2600); }
+
+// ── hyperscript ──────────────────────────────────────────────────
+const $ = (id) => document.getElementById(id);
+const h = (tag, attrs, ...ch) => {
+  const el = document.createElement(tag);
+  if (attrs) Object.entries(attrs).forEach(([k, v]) => {
+    if (v == null) return;
+    if (k === 'class') el.className = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2).toLowerCase(), v);
+    else if (k === 'style' && typeof v === 'object') Object.assign(el.style, v);
+    else if (k === 'html') el.innerHTML = v;
+    else if (v === false) return;              // boolean attr off (e.g. disabled:false) — must NOT be set
+    else if (v === true) el.setAttribute(k, ''); // boolean attr on
+    else el.setAttribute(k, v);
+  });
+  ch.flat(9).forEach(c => { if (c != null && c !== false) el.append(typeof c === 'object' ? c : document.createTextNode(String(c))); });
+  return el;
+};
+const EXT_COLOR = (e) => { e = (e || '').replace('.', ''); if (['xlsx', 'xls', 'xlsm', 'csv', 'tsv'].includes(e)) return '#e7f6ec,#067647'; if (['pdf'].includes(e)) return '#fdecec,#d92d20'; if (['doc', 'docx'].includes(e)) return '#e8f0fe,#1d4fd7'; if (['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(e)) return '#f3ecfe,#7e22ce'; return '#eef1f6,#475467'; };
+
+// ── Boot ─────────────────────────────────────────────────────────
+async function boot() {
+  try { const c = await api.check(); state.authed = !!c.ok; if (c.ok) { state.user = c.name || ''; state.isAdmin = !!c.admin; } } catch { state.authed = false; }
+  if (state.authed) await refreshAll();
+  render();
+}
+async function refreshAll() {
+  try {
+    const [st, fo, tm] = await Promise.all([api.stats(), api.folders(), api.team()]);
+    state.stats = st; state.folders = fo.folders; state.rootCount = fo.root_file_count; state.team = tm;
+    if (st && st.me) { state.user = st.me; state.isAdmin = !!st.is_admin; }
+    await loadFiles();
+    state.notifications = await api.notifications(state.user);
+  } catch (e) { /* auth handled in req */ }
+}
+async function loadFiles() {
+  const folderId = state.curFolder ? state.curFolder.id : 'root';
+  const res = await api.files(folderId, '');
+  state.files = res.files || [];
+}
+
+// ── Render ───────────────────────────────────────────────────────
+function render() {
+  const app = $('app'); app.innerHTML = '';
+  if (state.toast) app.append(h('div', { class: 'toast ' + (state.toast.err ? 'toast-err' : 'toast-ok') }, state.toast.msg));
+  if (state.authed === null) { app.append(h('p', { style: { textAlign: 'center', padding: '60px', color: '#64748b' } }, 'Connecting…')); return; }
+  if (!state.authed) return renderLogin(app);
+
+  app.append(renderHeader());
+  app.append(renderTabs());
+  const content = h('div', { class: 'content' });
+  if (state.tab === 'drive') renderDrive(content);
+  else if (state.tab === 'search') renderSearch(content);
+  else if (state.tab === 'inbox') renderInbox(content);
+  else if (state.tab === 'team') renderTeam(content);
+  app.append(content);
+  if (state.modal) app.append(state.modal());
+}
+
+function renderLogin(app) {
+  const box = h('div', { class: 'card login-box' });
+  box.append(h('div', { style: { fontSize: '22px', fontWeight: 700, color: '#101828', marginBottom: '4px' } }, 'Vendor Drive'));
+  box.append(h('p', { class: 'muted', style: { marginBottom: '18px' } }, 'Who are you? Pick your name and enter your password.'));
+  const sel = h('select', { class: 'inp', style: { marginBottom: '10px' } });
+  sel.append(h('option', { value: '' }, '— choose your name —'));
+  (state.accounts || []).forEach(a => sel.append(h('option', { value: a.name }, a.name + (a.admin ? '  (admin)' : ''))));
+  const inp = h('input', { class: 'inp', type: 'password', placeholder: 'Password', style: { marginBottom: '10px' } });
+  const go = async () => {
+    if (!sel.value) return toast('Pick your name first', true);
+    try { const r = await api.login(sel.value, inp.value); state.authed = true; state.user = r.name; state.isAdmin = !!r.admin; await refreshAll(); render(); }
+    catch (e) { toast(e.message, true); }
+  };
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+  box.append(sel, inp);
+  box.append(h('button', { class: 'btn', style: { width: '100%' }, onClick: go }, 'Log in'));
+  // load the accounts list for the dropdown
+  if (!state.accounts.length) api.accounts().then(a => { state.accounts = a; render(); }).catch(() => {});
+  app.append(box);
+  setTimeout(() => sel.focus(), 30);
+}
+
+function renderHeader() {
+  const hdr = h('div', { style: { padding: '14px 18px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' } });
+  const left = h('div');
+  left.append(h('div', { style: { fontSize: '19px', fontWeight: 700, color: '#101828' } }, 'Vendor Drive'));
+  if (state.stats) left.append(h('div', { class: 'muted', style: { marginTop: '2px' } },
+    `${state.stats.file_count} files · ${state.stats.folder_count} folders · ${state.stats.total_size_h}`));
+  hdr.append(left);
+
+  const uwrap = h('div', { style: { position: 'relative' } });
+  const ub = h('button', { class: 'btn-ghost', style: { display: 'flex', alignItems: 'center', gap: '7px' }, onClick: () => { state.showMenu = !state.showMenu; render(); } });
+  ub.append(h('span', { style: { width: '20px', height: '20px', borderRadius: '50%', background: '#2563eb', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '11px', fontWeight: 700 } }, (state.user[0] || '?').toUpperCase()));
+  ub.append(document.createTextNode(' ' + (state.user || '?') + ' ▾'));
+  if (state.isAdmin) ub.append(h('span', { class: 'tag', style: { marginLeft: '2px' } }, 'admin'));
+  uwrap.append(ub);
+  if (state.showMenu) {
+    const dd = h('div', { class: 'drop' });
+    dd.append(h('div', { class: 'tiny', style: { padding: '4px 10px' } }, 'Signed in as ' + state.user));
+    dd.append(h('button', { class: 'drop-item', onClick: () => { state.showMenu = false; myPwModal(); } }, 'Change my password'));
+    dd.append(h('button', { class: 'drop-item', onClick: async () => { await api.logout(); state.authed = false; state.user = ''; state.isAdmin = false; state.showMenu = false; state.accounts = []; render(); } }, 'Log out'));
+    uwrap.append(dd);
+  }
+  hdr.append(uwrap);
+  return hdr;
+}
+
+function renderTabs() {
+  const unread = state.notifications.filter(n => n.to_user === state.user && n.status === 'unread').length;
+  const tabs = h('div', { class: 'tabs' });
+  const def = [['drive', 'Drive'], ['search', 'Ask AI'], ['inbox', 'Inbox'], ['team', 'Team']];
+  def.forEach(([id, label]) => {
+    const t = h('button', { class: 'tab' + (state.tab === id ? ' active' : ''), onClick: () => { state.tab = id; state.fileSearch = ''; state.fileMatches = null; render(); } }, label);
+    if (id === 'inbox' && unread) t.append(h('span', { class: 'badge' }, String(unread)));
+    tabs.append(t);
+  });
+  return tabs;
+}
+
+// ── DRIVE ────────────────────────────────────────────────────────
+function renderDrive(c) {
+  // toolbar
+  const bar = h('div', { style: { display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' } });
+  const up = h('button', { class: 'btn', onClick: () => triggerUpload() }, '⤒ Upload files');
+  const nf = h('button', { class: 'btn-ghost', onClick: newFolderModal }, '+ New folder');
+  bar.append(up, nf);
+  if (state.isAdmin) bar.append(h('a', { class: 'btn-ghost', href: '/api/export.zip', title: 'Admin: download every file as a zip backup', style: { textDecoration: 'none' } }, '⬇ Backup (zip)'));
+  const search = h('input', { class: 'inp', placeholder: 'Search across every file…', value: state.fileSearch, style: { flex: '1', minWidth: '200px' } });
+  search.addEventListener('input', e => { state.fileSearch = e.target.value; });
+  search.addEventListener('keydown', e => { if (e.key === 'Enter') doFileSearch(); });
+  bar.append(search);
+  bar.append(h('button', { class: 'btn-ghost', onClick: doFileSearch }, 'Find'));
+  c.append(bar);
+
+  // search results across everything
+  if (state.fileMatches !== null) {
+    const head = h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' } });
+    head.append(h('div', { style: { fontWeight: 600 } }, `${state.fileMatches.length} file(s) matched “${state.fileSearch}”`));
+    head.append(h('button', { class: 'btn-sm', onClick: () => { state.fileMatches = null; state.fileSearch = ''; render(); } }, '✕ Clear'));
+    c.append(head);
+    if (!state.fileMatches.length) c.append(h('p', { class: 'muted' }, 'Nothing found. Try the AI Search tab for a smarter look, or different words.'));
+    state.fileMatches.forEach(m => c.append(matchRow(m)));
+    return;
+  }
+
+  // breadcrumb
+  const crumb = h('div', { style: { marginBottom: '10px', fontSize: '13px' } });
+  const rootLink = h('button', { class: 'drop-item', style: { display: 'inline', width: 'auto', padding: '2px 6px', color: state.curFolder ? '#2563eb' : '#101828', fontWeight: state.curFolder ? '500' : '600' }, onClick: () => { state.curFolder = null; loadFiles().then(render); } }, 'All files');
+  crumb.append(rootLink);
+  if (state.curFolder) { crumb.append(document.createTextNode('  ›  ')); crumb.append(h('strong', {}, state.curFolder.name)); }
+  c.append(crumb);
+
+  // folders (only at root)
+  if (!state.curFolder && state.folders.length) {
+    const grid = h('div', { class: 'folder-grid' });
+    state.folders.forEach(f => {
+      const card = h('button', { class: 'folder-card', onClick: () => { state.curFolder = { id: f.id, name: f.name }; loadFiles().then(render); } });
+      const top = h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } });
+      top.append(h('span', { style: { fontSize: '26px', lineHeight: '1' } }, f.locked ? '🔒' : '📁'));
+      const fa = h('div', { style: { display: 'flex', gap: '4px' } });
+      if (state.isAdmin) fa.append(h('span', { class: 'btn-sm', style: { padding: '2px 7px' }, title: f.locked ? 'Unlock' : 'Lock', onClick: (e) => { e.stopPropagation(); toggleLockFolder(f); } }, f.locked ? '🔓' : '🔒'));
+      if (state.isAdmin && !f.locked) fa.append(h('span', { class: 'btn-sm', style: { padding: '2px 7px' }, title: 'Delete', onClick: (e) => { e.stopPropagation(); confirmDeleteFolder(f); } }, '🗑'));
+      top.append(fa);
+      card.append(top);
+      card.append(h('div', { style: { fontWeight: 600, fontSize: '14.5px', color: '#101828', marginTop: '10px', wordBreak: 'break-word' } }, f.name));
+      card.append(h('div', { class: 'muted', style: { marginTop: '2px' } }, f.file_count + ' file' + (f.file_count === 1 ? '' : 's') + (f.locked ? ' · locked' : '')));
+      grid.append(card);
+    });
+    c.append(grid);
+  }
+
+  // files
+  if (!state.files.length) {
+    c.append(h('div', { class: 'card', style: { textAlign: 'center', padding: '30px', color: '#64748b' } },
+      state.curFolder ? 'This folder is empty. Upload files into it.' : 'No files yet. Hit Upload — drop in as many spreadsheets as you like.'));
+  } else {
+    c.append(h('div', { class: 'tiny', style: { marginBottom: '6px' } }, (state.curFolder ? state.curFolder.name : 'Files not in a folder')));
+    state.files.forEach(f => c.append(fileRow(f)));
+  }
+}
+
+function fileRow(f) {
+  const [bg, fg] = EXT_COLOR(f.ext).split(',');
+  const row = h('div', { class: 'frow' });
+  row.append(h('div', { class: 'ficon', style: { background: bg, color: fg } }, (f.ext || '?').replace('.', '').slice(0, 4).toUpperCase()));
+  const mid = h('div', { style: { flex: '1', minWidth: '0', cursor: 'pointer' }, onClick: () => openPreview(f.file_id) });
+  const nameLine = h('div', { class: 'fname' }, f.file_name);
+  if (f.locked) nameLine.append(h('span', { class: 'tag', style: { marginLeft: '7px', background: '#fef3c7', color: '#b45309' } }, '🔒 locked'));
+  mid.append(nameLine);
+  const meta = [f.size_h]; if (f.row_count) meta.push(f.row_count + ' rows'); if (f.sheet_count > 1) meta.push(f.sheet_count + ' sheets'); if (f.uploaded_by) meta.push('by ' + f.uploaded_by);
+  mid.append(h('div', { class: 'fmeta' }, meta.join(' · ')));
+  row.append(mid);
+  const mine = (f.uploaded_by || '') === state.user;
+  const acts = h('div', { style: { display: 'flex', gap: '5px', flexShrink: '0' } });
+  acts.append(h('a', { class: 'btn-sm', href: f.download_url, title: 'Download', style: { textDecoration: 'none' } }, '↓'));
+  acts.append(h('button', { class: 'btn-sm', title: 'Ping about this file', onClick: () => pingModal(f) }, '📣'));
+  if (state.isAdmin) acts.append(h('button', { class: 'btn-sm', title: f.locked ? 'Unlock' : 'Lock', onClick: () => toggleLockFile(f) }, f.locked ? '🔓' : '🔒'));
+  if (!f.locked) acts.append(h('button', { class: 'btn-sm', title: 'Move', onClick: () => moveModal(f) }, '↔'));
+  if ((state.isAdmin || mine) && (!f.locked || state.isAdmin)) acts.append(h('button', { class: 'btn-sm', title: 'Delete', onClick: () => confirmDeleteFile(f) }, '🗑'));
+  row.append(acts);
+  return row;
+}
+
+function matchRow(m) {
+  const wrap = h('div', { class: 'card', style: { marginBottom: '8px' } });
+  const top = h('div', { style: { display: 'flex', justifyContent: 'space-between', gap: '10px' } });
+  const t = h('div', { style: { cursor: 'pointer' }, onClick: () => openPreview(m.file_id) });
+  t.append(h('span', { style: { fontWeight: 600 } }, m.file_name));
+  if (m.folder) t.append(h('span', { class: 'muted' }, '  in ' + m.folder));
+  top.append(t);
+  const acts = h('div', { style: { display: 'flex', gap: '5px' } });
+  acts.append(h('a', { class: 'btn-sm', href: '/api/files/' + m.file_id + '/download', style: { textDecoration: 'none' } }, '↓'));
+  acts.append(h('button', { class: 'btn-sm', onClick: () => openPreview(m.file_id) }, 'Open'));
+  top.append(acts);
+  wrap.append(top);
+  if (m.snippets && m.snippets.length) wrap.append(h('div', { class: 'snip' }, m.snippets.join('\n')));
+  return wrap;
+}
+
+async function doFileSearch() {
+  const q = state.fileSearch.trim();
+  if (!q) { state.fileMatches = null; render(); return; }
+  try { const res = await api.files('', q); state.fileMatches = res.matches || []; render(); }
+  catch (e) { toast(e.message, true); }
+}
+
+function triggerUpload() {
+  const inp = $('fileInput');
+  inp.value = '';
+  inp.onchange = async () => {
+    if (!inp.files.length) return;
+    toast('Uploading ' + inp.files.length + ' file(s)…');
+    try {
+      const folderId = state.curFolder ? state.curFolder.id : '';
+      const res = await api.upload(inp.files, folderId);
+      await refreshAll(); render();
+      toast(res.count + ' file(s) added' + (state.curFolder ? ' to ' + state.curFolder.name : ''));
+    } catch (e) { toast(e.message, true); }
+  };
+  inp.click();
+}
+
+// ── ASK AI ───────────────────────────────────────────────────────
+function renderSearch(c) {
+  const ready = state.stats || {};
+  c.append(h('p', { class: 'muted', style: { marginBottom: '8px' } },
+    'Ask about anything in the drive — “who supplies M6 bolts?”, “which file has Acme’s number?”. Or tell me to do things: “create folder Quotes”, “move contacts.csv to Vendors”. If it’s not in the drive, I’ll check the web.'));
+
+  if (!ready.gemini_ready) c.append(h('div', { class: 'card', style: { background: '#fffbeb', borderColor: '#fde68a', color: '#92400e', marginBottom: '10px', fontSize: '12.5px' } },
+    'Add a free Gemini key to .env for written AI answers. Right now: keyword search, folder-create and move commands still work.'));
+  else {
+    const q = ready.reasoning_quota, w = ready.web_search_quota;
+    c.append(h('div', { class: 'muted', style: { marginBottom: '8px' } }, `Your daily share (split across ${ready.member_count || '?'} members) — AI: ${q ? q.remaining : '–'}/${q ? q.limit : '–'} left · web: ${w ? w.remaining : '–'}/${w ? w.limit : '–'} left${ready.tavily_ready ? '' : ' (add Tavily key)'}. Resets midnight UTC. Errors show the exact reason below.`));
+  }
+
+  const ta = h('textarea', { class: 'inp', rows: '2', placeholder: 'Ask, or give a command… (Enter to send)', style: { marginBottom: '8px' } }, state.searchQuery);
+  ta.addEventListener('input', e => state.searchQuery = e.target.value);
+  ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); runAsk(); } });
+  c.append(ta);
+  const brow = h('div', { style: { display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' } });
+  brow.append(h('button', { class: 'btn', disabled: state.searchBusy, onClick: runAsk }, state.searchBusy ? 'Thinking…' : 'Ask'));
+  brow.append(h('button', { class: 'btn-ghost', disabled: state.searchBusy, onClick: async () => { try { state.searchBusy = true; render(); const r = await api.organize(); state.chat.push({ q: 'Sort the drive', a: r.result }); saveChat(); state.searchBusy = false; render(); } catch (e) { state.searchBusy = false; toast(e.message, true); } } }, '✨ Help me sort the drive'));
+  if (state.chat.length) brow.append(h('button', { class: 'btn-ghost', onClick: () => { state.chat = []; saveChat(); render(); } }, 'Clear chat'));
+  c.append(brow);
+
+  // Clear "it's working" indicator so the AI never looks dead.
+  if (state.searchBusy) {
+    const busy = h('div', { class: 'card', style: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', borderColor: '#cfe0ff' } });
+    busy.append(h('span', { class: 'spinner' }));
+    const t2 = h('div');
+    t2.append(h('div', { style: { fontWeight: 600 } }, 'Working on it…'));
+    t2.append(h('div', { class: 'muted' }, (state.searchPending ? '“' + state.searchPending + '” — ' : '') + 'reading your files and thinking. On the free tier this can take 5–20 seconds.'));
+    busy.append(t2);
+    c.append(busy);
+  }
+
+  // Show only the LATEST answer (kept clean). Earlier turns stay in memory for
+  // context but aren't dumped on screen.
+  const t = state.searchBusy ? null : state.chat[state.chat.length - 1];
+  if (t) {
+    c.append(h('div', { style: { fontWeight: 600, margin: '6px 0 4px' } }, 'You: ', h('span', { style: { fontWeight: 400 } }, t.q)));
+    const box = h('div', { class: 'card', style: { borderColor: t.err ? '#fecaca' : '#e4e8ef' } });
+    box.append(h('div', { class: 'answer', style: t.err ? { color: '#b42318' } : {} }, t.a || ''));
+    if (t.sources && t.sources.length) {
+      const wrap = h('div', { style: { marginTop: '10px' } });
+      t.sources.forEach(m => wrap.append(h('button', { class: 'chip', onClick: () => openPreview(m.file_id) }, '📄 ' + m.file_name)));
+      box.append(wrap);
+    }
+    c.append(box);
+    if (state.chat.length > 1) c.append(h('div', { class: 'muted', style: { marginTop: '8px' } }, `(${state.chat.length - 1} earlier question${state.chat.length - 1 === 1 ? '' : 's'} remembered for context — “Clear chat” to reset)`));
+  }
+}
+
+async function runAsk() {
+  const q = state.searchQuery.trim();
+  if (!q) { toast('Ask something first', true); return; }
+  state.searchBusy = true;
+  state.searchPending = q;
+  const context = state.chat.slice(-4).map(t => ({ q: t.q, a: t.err ? '' : t.a }));
+  render();
+  try {
+    const res = await api.assistant(q, context);
+    state.chat.push({ q, a: res.reply, sources: res.sources });
+    if (res.refresh) await refreshAll();
+    if (state.stats) state.stats = await api.stats().catch(() => state.stats);
+  } catch (e) {
+    state.chat.push({ q, a: e.message, err: true });
+  }
+  state.chat = state.chat.slice(-12); saveChat();
+  state.searchQuery = '';
+  state.searchBusy = false; render();
+}
+
+// ── INBOX ────────────────────────────────────────────────────────
+function renderInbox(c) {
+  const mine = state.notifications.filter(n => n.to_user === state.user);
+  const sent = state.notifications.filter(n => n.from_user === state.user && n.to_user !== state.user);
+  c.append(h('div', { class: 'tiny' }, 'For you'));
+  if (!mine.length) c.append(h('p', { class: 'muted', style: { marginBottom: '14px' } }, 'Nothing here. Pings sent to you land in this inbox — no email or app needed.'));
+  mine.forEach(n => c.append(notifRow(n, true)));
+  if (sent.length) { c.append(h('div', { class: 'tiny', style: { marginTop: '16px' } }, 'Sent by you')); sent.forEach(n => c.append(notifRow(n, false))); }
+}
+function notifRow(n, incoming) {
+  const unread = incoming && n.status === 'unread';
+  const row = h('div', { class: 'card', style: { marginBottom: '6px', borderColor: unread ? '#3b82f6' : '#334155' } });
+  const top = h('div', { style: { display: 'flex', justifyContent: 'space-between', gap: '8px' } });
+  top.append(h('span', { class: 'tag' }, (n.action || 'ping').replace(/_/g, ' ')));
+  top.append(h('span', { class: 'muted' }, (n.created_at || '').slice(0, 16).replace('T', ' ')));
+  row.append(top);
+  row.append(h('div', { style: { marginTop: '5px' } }, incoming ? `From ${n.from_user || 'someone'}` : `To ${n.to_user}`));
+  if (n.message) row.append(h('div', { class: 'muted', style: { marginTop: '3px' } }, n.message));
+  const acts = h('div', { style: { marginTop: '7px', display: 'flex', gap: '6px' } });
+  if (n.file_id) acts.append(h('button', { class: 'btn-sm', onClick: () => openPreview(n.file_id) }, 'Open file'));
+  if (unread) acts.append(h('button', { class: 'btn-sm', onClick: async () => { await api.markRead(n.id); n.status = 'read'; render(); } }, 'Mark read'));
+  if (acts.children.length) row.append(acts);
+  return row;
+}
+
+// ── TEAM ─────────────────────────────────────────────────────────
+function renderTeam(c) {
+  if (state.isAdmin) {
+    c.append(h('p', { class: 'muted', style: { marginBottom: '10px' } }, 'You’re an admin. Add people, set their password, or make someone an admin. Everyone logs in by picking their name + password.'));
+    const form = h('div', { class: 'card', style: { marginBottom: '16px' } });
+    const nm = h('input', { class: 'inp', placeholder: 'Name', style: { marginBottom: '6px' } });
+    const pw = h('input', { class: 'inp', placeholder: 'Password (e.g. a simple word or letter)', style: { marginBottom: '6px' } });
+    const adm = h('input', { type: 'checkbox', style: { marginRight: '6px' } });
+    const admLbl = h('label', { style: { display: 'flex', alignItems: 'center', margin: '4px 0 8px', fontSize: '13px' } }); admLbl.append(adm, document.createTextNode('Make this person an admin'));
+    form.append(nm, pw, admLbl);
+    form.append(h('button', { class: 'btn', onClick: async () => { if (!nm.value.trim()) return toast('Name required', true); try { await api.addMember({ name: nm.value.trim(), password: pw.value.trim() || 'x', is_admin: adm.checked }); state.team = await api.team(); render(); toast('Saved'); } catch (e) { toast(e.message, true); } } }, 'Add / update member'));
+    c.append(form);
+  } else {
+    c.append(h('p', { class: 'muted', style: { marginBottom: '10px' } }, 'The team. Only admins can add people or change passwords.'));
+  }
+  state.team.forEach(m => {
+    const row = h('div', { class: 'frow' });
+    row.append(h('div', { class: 'ficon', style: { background: m.is_admin ? '#2563eb' : '#94a3b8', color: '#fff' } }, (m.name[0] || '?').toUpperCase()));
+    const mid = h('div', { style: { flex: '1' } });
+    const nameLine = h('div', { class: 'fname' }, m.name);
+    if (m.is_admin) nameLine.append(h('span', { class: 'tag', style: { marginLeft: '7px' } }, 'admin'));
+    mid.append(nameLine);
+    if (state.isAdmin && m.password !== undefined) mid.append(h('div', { class: 'fmeta' }, 'password: ' + (m.password || '—')));
+    row.append(mid);
+    if (state.isAdmin) {
+      const acts = h('div', { style: { display: 'flex', gap: '5px' } });
+      acts.append(h('button', { class: 'btn-sm', title: 'Set password', onClick: () => setPwModal(m) }, '🔑'));
+      acts.append(h('button', { class: 'btn-sm', title: m.is_admin ? 'Make non-admin' : 'Make admin', onClick: async () => { try { await api.addMember({ id: m.id, name: m.name, is_admin: !m.is_admin }); state.team = await api.team(); render(); } catch (e) { toast(e.message, true); } } }, m.is_admin ? '↓' : '⬆'));
+      if (m.name !== state.user) acts.append(h('button', { class: 'btn-sm', title: 'Remove', onClick: () => simpleConfirm('Remove member', 'Remove ' + m.name + '? They won’t be able to log in.', 'Remove', async () => { await api.removeMember(m.id); state.team = await api.team(); closeModal(); render(); }) }, '🗑'));
+      row.append(acts);
+    }
+    c.append(row);
+  });
+}
+function myPwModal() {
+  const inp = h('input', { class: 'inp', type: 'password', placeholder: 'New password' });
+  const body = h('div'); body.append(h('div', { class: 'tiny' }, 'Change your own password'), inp);
+  const go = async () => { if (!inp.value.trim()) return; try { await api.changeMyPassword(inp.value.trim()); closeModal(); toast('Password changed'); } catch (e) { toast(e.message, true); } };
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+  const foot = h('div', { style: { marginTop: '12px', display: 'flex', gap: '8px', justifyContent: 'flex-end' } });
+  foot.append(h('button', { class: 'btn-ghost', onClick: closeModal }, 'Cancel'));
+  foot.append(h('button', { class: 'btn', onClick: go }, 'Change'));
+  state.modal = modalShell('Change my password', body, foot); render(); setTimeout(() => inp.focus(), 30);
+}
+function setPwModal(m) {
+  const inp = h('input', { class: 'inp', placeholder: 'New password' });
+  const body = h('div'); body.append(h('div', { class: 'tiny' }, 'New password for ' + m.name)); body.append(inp);
+  const foot = h('div', { style: { marginTop: '12px', display: 'flex', gap: '8px', justifyContent: 'flex-end' } });
+  foot.append(h('button', { class: 'btn-ghost', onClick: closeModal }, 'Cancel'));
+  foot.append(h('button', { class: 'btn', onClick: async () => { if (!inp.value.trim()) return; try { await api.addMember({ id: m.id, name: m.name, password: inp.value.trim() }); state.team = await api.team(); closeModal(); toast('Password set'); } catch (e) { toast(e.message, true); } } }, 'Set'));
+  state.modal = modalShell('Set password', body, foot); render(); setTimeout(() => inp.focus(), 30);
+}
+
+// ── Modals ───────────────────────────────────────────────────────
+function closeModal() { state.modal = null; render(); }
+function modalShell(title, body, footer) {
+  return () => {
+    const bg = h('div', { class: 'modal-bg', onClick: (e) => { if (e.target === bg) closeModal(); } });
+    const m = h('div', { class: 'modal' });
+    const head = h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' } });
+    head.append(h('div', { style: { fontSize: '16px', fontWeight: 700 } }, title));
+    head.append(h('button', { class: 'btn-sm', onClick: closeModal }, '✕'));
+    m.append(head); m.append(body); if (footer) m.append(footer);
+    bg.append(m); return bg;
+  };
+}
+
+function newFolderModal() {
+  const inp = h('input', { class: 'inp', placeholder: 'Folder name' });
+  const body = h('div'); body.append(inp);
+  const foot = h('div', { style: { marginTop: '12px', display: 'flex', gap: '8px', justifyContent: 'flex-end' } });
+  foot.append(h('button', { class: 'btn-ghost', onClick: closeModal }, 'Cancel'));
+  foot.append(h('button', { class: 'btn', onClick: async () => { if (!inp.value.trim()) return; try { await api.createFolder(inp.value.trim()); await refreshAll(); closeModal(); toast('Folder created'); } catch (e) { toast(e.message, true); } } }, 'Create'));
+  state.modal = modalShell('New folder', body, foot); render(); setTimeout(() => inp.focus(), 30);
+}
+
+function moveModal(f) {
+  const sel = h('select', { class: 'inp' });
+  sel.append(h('option', { value: '' }, 'All files (no folder)'));
+  state.folders.forEach(fo => sel.append(h('option', { value: String(fo.id) }, fo.name)));
+  sel.value = f.folder_id ? String(f.folder_id) : '';
+  const body = h('div'); body.append(h('div', { class: 'tiny' }, 'Move “' + f.file_name + '” to')); body.append(sel);
+  const foot = h('div', { style: { marginTop: '12px', display: 'flex', gap: '8px', justifyContent: 'flex-end' } });
+  foot.append(h('button', { class: 'btn-ghost', onClick: closeModal }, 'Cancel'));
+  foot.append(h('button', { class: 'btn', onClick: async () => { try { await api.moveFile(f.file_id, sel.value || null); await refreshAll(); closeModal(); toast('Moved'); } catch (e) { toast(e.message, true); } } }, 'Move'));
+  state.modal = modalShell('Move file', body, foot); render();
+}
+
+function pingModal(f) {
+  const body = h('div');
+  const sel = h('select', { class: 'inp', style: { marginBottom: '8px' } });
+  state.team.filter(m => m.name !== state.user).forEach(m => sel.append(h('option', { value: String(m.id) }, m.name)));
+  if (!sel.children.length) { body.append(h('p', { class: 'muted' }, 'Add a teammate in the Team tab first.')); state.modal = modalShell('Ping', body, null); return render(); }
+  const act = h('select', { class: 'inp', style: { marginBottom: '8px' } });
+  [['look_at_file', 'Please look at this file'], ['review_request', 'Please review'], ['quote_request', 'Get a quote'], ['nda_request', 'NDA'], ['purchase_request', 'Purchase'], ['info_share', 'Just sharing']].forEach(([v, l]) => act.append(h('option', { value: v }, l)));
+  const msg = h('textarea', { class: 'inp', rows: '2', placeholder: 'Message (optional)' });
+  body.append(h('div', { class: 'tiny' }, 'To'), sel, h('div', { class: 'tiny' }, 'About'), act, h('div', { class: 'tiny' }, 'Note'), msg);
+  if (f) body.append(h('p', { class: 'muted', style: { marginTop: '6px' } }, 'File: ' + f.file_name));
+  const foot = h('div', { style: { marginTop: '12px', display: 'flex', gap: '8px', justifyContent: 'flex-end' } });
+  foot.append(h('button', { class: 'btn-ghost', onClick: closeModal }, 'Cancel'));
+  foot.append(h('button', { class: 'btn', onClick: async () => { try { await api.ping({ from_user: state.user, to_member_id: Number(sel.value), action: act.value, message: msg.value, file_id: f ? f.file_id : '' }); closeModal(); toast('Pinged ' + (state.team.find(m => m.id == sel.value) || {}).name); } catch (e) { toast(e.message, true); } } }, 'Send ping'));
+  state.modal = modalShell('Ping a teammate', body, foot); render();
+}
+
+function simpleConfirm(title, warn, okLabel, onOk) {
+  const body = h('div'); body.append(h('p', { style: { color: '#b42318' } }, warn));
+  const foot = h('div', { style: { marginTop: '12px', display: 'flex', gap: '8px', justifyContent: 'flex-end' } });
+  foot.append(h('button', { class: 'btn-ghost', onClick: closeModal }, 'Cancel'));
+  foot.append(h('button', { class: 'btn btn-red', onClick: async () => { try { await onOk(); } catch (e) { toast(e.message, true); } } }, okLabel));
+  state.modal = modalShell(title, body, foot); render();
+}
+function confirmDeleteFile(f) {
+  simpleConfirm('Delete file', 'Permanently remove “' + f.file_name + '” for everyone?', 'Delete', async () => {
+    await api.deleteFile(f.file_id); await refreshAll(); closeModal(); toast('Deleted');
+  });
+}
+function confirmDeleteFolder(f) {
+  simpleConfirm('Delete folder', 'Delete “' + f.name + '” and the ' + f.file_count + ' file(s) inside it, for everyone?', 'Delete', async () => {
+    await api.deleteFolder(f.id); if (state.curFolder && state.curFolder.id === f.id) state.curFolder = null; await refreshAll(); closeModal(); toast('Folder deleted');
+  });
+}
+async function toggleLockFile(f) {
+  try { await api.lockFile(f.file_id); await refreshAll(); toast(f.locked ? 'Unlocked' : 'Locked'); } catch (e) { toast(e.message, true); }
+}
+async function toggleLockFolder(f) {
+  try { await api.lockFolder(f.id); await refreshAll(); toast(f.locked ? 'Unlocked' : 'Locked'); } catch (e) { toast(e.message, true); }
+}
+
+// Turn a cell value into a clickable link when it's a URL or email, so vendor
+// websites/emails in the sheet are one click away.
+function cellNode(v) {
+  v = String(v == null ? '' : v);
+  const t = v.trim();
+  if (/^(https?:\/\/|www\.)[^\s]+$/i.test(t)) {
+    const href = t.toLowerCase().startsWith('http') ? t : 'https://' + t;
+    return h('a', { href, target: '_blank', rel: 'noopener' }, v);
+  }
+  if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(t)) return h('a', { href: 'mailto:' + t }, v);
+  return document.createTextNode(v);
+}
+
+// auto-grow an edit box so the whole cell value is visible while typing
+function growCell(t) { t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight + 2, 200) + 'px'; }
+
+async function openPreview(fid) {
+  state.modal = modalShell('Loading…', h('p', { class: 'muted' }, 'Reading file…'), null); render();
+  let p;
+  try { p = await api.preview(fid); }
+  catch (e) { closeModal(); toast(e.message, true); return; }
+
+  const f = p.file || {};
+  const canEditFile = !f.locked && /\.(xlsx|xlsm|xltx|xls|csv|tsv)$/i.test(f.file_name || '');
+  let editing = false;   // read-first: everyone can READ full cells; editing is opt-in
+
+  function paint() {
+    const body = h('div');
+    const info = h('div', { style: { display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' } });
+    info.append(h('a', { class: 'btn', href: f.download_url, style: { textDecoration: 'none' } }, '↓ Download original'));
+    info.append(h('button', { class: 'btn-ghost', onClick: () => { state.tab = 'search'; state.searchQuery = `Draft a short, client-ready email summarising the vendors and costings in the file "${f.file_name}": who offers what, prices where they exist, and a clear recommendation. Write it as a clean email I can send to a client — no internal row/sheet references.`; closeModal(); render(); runAsk(); } }, '✉️ Draft client email'));
+    info.append(h('button', { class: 'btn-ghost', onClick: () => { const ff = state.files.find(x => x.file_id === fid) || f; pingModal(ff); } }, '📣 Ping about this'));
+    body.append(info);
+    body.append(h('div', { class: 'muted', style: { marginBottom: '10px' } }, [f.size_h, f.row_count ? f.row_count + ' rows' : '', f.folder_name ? 'in ' + f.folder_name : ''].filter(Boolean).join(' · ')));
+
+    if (p.error) { body.append(h('div', { class: 'card' }, p.error)); state.modal = modalShell(f.file_name || 'File', body, null); render(); return; }
+    if (p.text != null) { body.append(h('pre', { class: 'snip', style: { maxHeight: '420px' } }, p.text)); state.modal = modalShell(f.file_name || 'File', body, null); render(); return; }
+    if (!p.sheets) { state.modal = modalShell(f.file_name || 'File', body, null); render(); return; }
+
+    // Read/Edit toggle — read view wraps every cell so the FULL text is visible
+    // without clicking. Editing is behind the toggle so the default is clean.
+    if (canEditFile) {
+      const bar = h('div', { style: { display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '10px' } });
+      if (!editing) bar.append(h('button', { class: 'btn-sm', onClick: () => { editing = true; paint(); } }, '✏️ Edit cells'));
+      else {
+        bar.append(h('span', { class: 'tiny', style: { color: '#2563eb', fontWeight: '600' } }, 'Editing — change any cell, then Save.'));
+        bar.append(h('button', { class: 'btn-ghost btn-sm', onClick: () => { editing = false; paint(); } }, 'Done reading only'));
+      }
+      body.append(bar);
+    }
+
+    p.sheets.forEach((sh, si) => {
+      const smallSheet = si === 0 && sh.rows.length >= sh.total_rows;   // whole sheet is loaded
+      const fullEdit = editing && canEditFile && si === 0 && smallSheet;
+      const grid = sh.rows.map(r => sh.headers.map((_, i) => (r[i] != null ? String(r[i]) : '')));
+      body.append(h('div', { class: 'tiny', style: { marginTop: '8px' } }, sh.name + '  ·  ' + sh.total_rows + ' rows' + (sh.rows.length < sh.total_rows ? ' (showing first ' + sh.rows.length + ')' : '')));
+
+      const scr = h('div', { style: { overflow: 'auto', maxHeight: '400px', border: '1px solid #e4e8ef', borderRadius: '8px' } });
+      const tbl = h('table', { class: 'ptable' });
+      const thead = h('thead'); const trh = h('tr'); sh.headers.forEach(hd => trh.append(h('th', {}, hd))); thead.append(trh); tbl.append(thead);
+      const tb = h('tbody');
+      grid.forEach(r => {
+        const tr = h('tr');
+        sh.headers.forEach((_, i) => {
+          const td = h('td');
+          if (fullEdit) {
+            const inp = h('textarea', { class: 'cellinp', rows: '1' }); inp.value = r[i] || '';
+            inp.addEventListener('input', e => { r[i] = e.target.value; growCell(e.target); });
+            td.append(inp);
+          } else {
+            td.append(h('div', { class: 'rcell' }, cellNode(r[i] || '')));
+          }
+          tr.append(td);
+        });
+        tb.append(tr);
+      });
+      tbl.append(tb); scr.append(tbl); body.append(scr);
+
+      if (si === 0 && canEditFile) {
+        const eb = h('div', { style: { display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap', alignItems: 'center' } });
+        eb.append(h('button', { class: 'btn-sm', onClick: () => addRowForm(fid, sh.headers) }, '＋ Add row'));
+        if (fullEdit) eb.append(h('button', { class: 'btn', onClick: async () => { try { await api.saveTable(fid, sh.headers, grid); await refreshAll(); toast('Saved to the file'); openPreview(fid); } catch (e) { toast(e.message, true); } } }, 'Save changes'));
+        else if (editing && !smallSheet) eb.append(h('span', { class: 'muted' }, 'Big sheet — use “Add row” (safely appends to the real file).'));
+        body.append(eb);
+      }
+    });
+    if (f.locked) body.append(h('div', { class: 'muted', style: { marginTop: '10px' } }, '🔒 Locked — unlock it on the Drive tab to edit.'));
+
+    state.modal = modalShell(f.file_name || 'File', body, null); render();
+    if (editing) requestAnimationFrame(() => document.querySelectorAll('.cellinp').forEach(growCell));
+  }
+
+  paint();
+}
+
+function addRowForm(fid, headers) {
+  const inputs = {};
+  const body = h('div');
+  body.append(h('p', { class: 'muted', style: { marginBottom: '6px' } }, 'This adds a real row to the spreadsheet in the drive — everyone will see it.'));
+  headers.forEach(hd => { body.append(h('div', { class: 'tiny', style: { marginTop: '6px' } }, hd)); const inp = h('input', { class: 'inp' }); inputs[hd] = inp; body.append(inp); });
+  const foot = h('div', { style: { marginTop: '12px', display: 'flex', gap: '8px', justifyContent: 'flex-end' } });
+  foot.append(h('button', { class: 'btn-ghost', onClick: () => openPreview(fid) }, 'Cancel'));
+  foot.append(h('button', { class: 'btn', onClick: async () => { const values = {}; Object.entries(inputs).forEach(([k, el]) => values[k] = el.value); try { await api.addRow(fid, values); await refreshAll(); toast('Row added to the file'); openPreview(fid); } catch (e) { toast(e.message, true); } } }, 'Add to sheet'));
+  state.modal = modalShell('Add a row', body, foot); render();
+}
+
+// go
+boot();
+document.addEventListener('click', (e) => { if (state.showMenu && !e.target.closest('.drop') && !e.target.closest('.btn-ghost')) { /* handled by re-render toggles */ } });
+</script>
+</body>
+</html>

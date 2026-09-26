@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BangOps — Studio Operations & Agent Architecture Walkthrough</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm 8mm 12mm;
+  }
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border-radius: 0 !important; /* Strict 0 corner radius everywhere */
+  }
+  body {
+    background: #ffffff;
+    color: #18181b;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 8pt;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Header */
+  header {
+    border-bottom: 1px solid #18181b;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .brand-line {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .brand-name {
+    font-size: 13pt;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: #09090b;
+  }
+  .brand-dot {
+    color: #a1a1aa;
+    font-size: 10pt;
+  }
+  .doc-title {
+    font-size: 9pt;
+    font-weight: 400;
+    color: #52525b;
+  }
+  .header-meta {
+    font-size: 7.5pt;
+    color: #71717a;
+  }
+  .header-tag {
+    font-size: 7pt;
+    font-weight: 500;
+    color: #52525b;
+    border: 1px solid #e4e4e7;
+    padding: 3px 8px;
+    background: #fafafa;
+  }
+
+  /* Grid Layout */
+  .grid-header {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: 16px;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #e4e4e7;
+  }
+  .col-title {
+    font-size: 7.5pt;
+    font-weight: 600;
+    color: #09090b;
+    letter-spacing: 0.01em;
+  }
+
+  /* Phase Container */
+  .phase-section {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 11px;
+  }
+  .phase-section:last-of-type {
+    margin-bottom: 0;
+  }
+  .phase-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 5px;
+    padding-bottom: 3px;
+    border-bottom: 1px dashed #e4e4e7;
+  }
+  .phase-name {
+    font-size: 8pt;
+    font-weight: 600;
+    color: #18181b;
+  }
+  .phase-timing {
+    font-size: 7pt;
+    color: #71717a;
+    font-weight: 400;
+  }
+
+  .phase-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+
+  /* Left Column: Chat Card */
+  .chat-card {
+    background: #fafafa;
+    border: 1px solid #e4e4e7;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .agent-prompt {
+    font-size: 8pt;
+    color: #18181b;
+    font-weight: 500;
+  }
+  .agent-label {
+    font-size: 7pt;
+    color: #71717a;
+    font-weight: 500;
+    margin-bottom: 1px;
+  }
+  .user-response {
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    padding: 3px 7px;
+    font-size: 7.5pt;
+    color: #27272a;
+    align-self: flex-start;
+    margin: 1px 0;
+  }
+  .button-row {
+    display: flex;
+    gap: 5px;
+    margin-top: 2px;
+  }
+  .btn-chip {
+    border: 1px solid #d4d4d8;
+    background: #ffffff;
+    font-size: 7pt;
+    font-weight: 500;
+    padding: 2px 7px;
+    color: #3f3f46;
+    display: inline-block;
+  }
+  .btn-chip.selected {
+    background: #18181b;
+    border-color: #18181b;
+    color: #ffffff;
+  }
+  .chat-note {
+    font-size: 7pt;
+    color: #71717a;
+    line-height: 1.35;
+  }
+
+  /* Right Column: Backend Explanation */
+  .backend-card {
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .backend-row {
+    display: grid;
+    grid-template-columns: 84px 1fr;
+    gap: 8px;
+    font-size: 7.5pt;
+    line-height: 1.35;
+    align-items: baseline;
+  }
+  .tech-label {
+    font-size: 6.8pt;
+    font-weight: 500;
+    color: #52525b;
+    padding: 1px 4px;
+    background: #f4f4f5;
+    border: 1px solid #e4e4e7;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .tech-desc {
+    color: #3f3f46;
+  }
+  .tech-desc code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 6.8pt;
+    background: #f4f4f5;
+    padding: 0 3px;
+    border: 1px solid #e4e4e7;
+    color: #18181b;
+    white-space: nowrap;
+  }
+
+  /* Highlights */
+  .highlight-alert {
+    color: #b91c1c;
+    font-weight: 500;
+  }
+  .highlight-lead {
+    color: #15803d;
+    font-weight: 500;
+  }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid #18181b;
+    padding-top: 5px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 7pt;
+    color: #71717a;
+  }
+  .footer-links {
+    display: flex;
+    gap: 12px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="brand-line">
+      <span class="brand-name">BangOps</span>
+      <span class="brand-dot">/</span>
+      <span class="doc-title">Studio Operations & 24/7 Personal Agent Architecture</span>
+    </div>
+    <div class="header-meta">
+      Bang Design · 1 Hour = 1 Credit Model · Google Workspace Native · Supabase Postgres
+    </div>
+  </div>
+  <div class="header-tag">
+    Technical Architecture Walkthrough
+  </div>
+</header>
+
+<div class="grid-header">
+  <div class="col-title">What the designer types and sees in Google Chat</div>
+  <div class="col-title">What executes in the backend</div>
+</div>
+
+<!-- PHASE 1 -->
+<div class="phase-section">
+  <div class="phase-heading">
+    <span class="phase-name">1. Morning check-in and attendance</span>
+    <span class="phase-timing">09:30 AM · Proactive nudge · 4 seconds total</span>
+  </div>
+  <div class="phase-grid">
+    <div class="chat-card">
+      <div class="agent-label">BangOps Assistant</div>
+      <div class="agent-prompt">Morning Akash. Are you coming into the studio today?</div>
+      <div class="button-row">
+        <span class="btn-chip selected">In Studio</span>
+        <span class="btn-chip">Working Remote</span>
+        <span class="btn-chip">Out Sick / Leave</span>
+      </div>
+      <div class="chat-note">Selecting <b>In Studio</b> prompts active projects:</div>
+      <div class="button-row">
+        <span class="btn-chip selected">STC: BPillar</span>
+        <span class="btn-chip">Nexa</span>
+        <span class="btn-chip">Essent</span>
+      </div>
+      <div class="chat-note">User picks a 2.5-hour focus block. No manual forms.</div>
+    </div>
+    <div class="backend-card">
+      <div class="backend-row">
+        <span class="tech-label">Cron Runner</span>
+        <span class="tech-desc">Scheduled job queries active team list and triggers outbound 1:1 Google Chat messages.</span>
+      </div>
+      <div class="backend-row">
+        <span class="tech-label">Jev Router</span>
+        <span class="tech-desc">Parses button payload <code>{status: "in_studio", project: "STC: BPillar"}</code> in ~90ms.</span>
+      </div>
+      <div class="backend-row">
+        <span class="tech-label">Supabase</span>
+        <span class="tech-desc">Updates <code>people.status = 'active'</code>. Real-time operations dashboard marks attendance.</span>
+      </div>
+      <div class="backend-row">
+        <span class="tech-label">Task Queue</span>
+        <span class="tech-desc">Registers background timer for T + 2.5 hours to check sprint completion.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 2 -->
+<div class="phase-section">
+  <div class="phase-heading">
+    <span class="phase-name">2. Sprint completion and timesheet write</span>
+    <span class="phase-timing">12:00 PM · Timer callback · Auto-logging</span>
+  </div>
+  <div class="phase-grid">
+    <div class="chat-card">
+      <div class="agent-label">BangOps Assistant</div>
+      <div class="agent-prompt">Your 2.5-hour focus block on STC: BPillar is up. What did you get done?</div>
+      <div class="user-response">Finished door cap CAD modeling and added NFC clips</div>
+      <div class="chat-note">
+        Assistant confirms write:<br>
+        Logged <span class="highlight-lead">2.5 credits</span> to <code>Resource_Akash_Pai.xlsx</code>:<br>
+        <i>"Completed door cap CAD modeling and integrated NFC sensor mount."</i>
+      </div>
+    </div>
+    <div class="backend-card">
+      <div class="backend-row">
+        <span class="tech-label">Groq Llama 3.1</span>
+        <span class="tech-desc">Rewrites casual conversational note into client-ready deliverable phrasing (~300ms).</span>
+      </div>
+      <div class="backend-row">
+        <span class="tech-label">Sheets API</span>
+        <span class="tech-desc">Authenticates via Workspace Service Account; opens user's personal spreadsheet.</span>
+      </div>
+      <div class="backend-row">
+        <span class="tech-label">Spreadsheet</span>
+        <span class="tech-desc">Finds date row in active tab <code>Sep 2026</code>; appends <code>[STC: BPillar, 2.5, Log]</code>.</span>
+      </div>
+      <div class="backend-row">
+        <span class="tech-label">Supabase</span>
+        <span class="tech-desc">Increments <code>projects.credits_burned += 2.5</code>. Founder dashboard updates live.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 3 -->
+<div class="phase-section">
+  <div class="phase-heading">
+    <span class="phase-name">3. Drive deep-scan and vendor intelligence</span>
+    <span class="phase-timing">02:30 PM · On-demand query · Instant benchmark</span>
+  </div>
+  <div class="phase-grid">
+    <div class="chat-card">
+      <div class="agent-label">Akash (to Assistant)</div>
+      <div class="user-response">Who quoted the cheapest SLA ABS 3D print for the front door panel?</div>
+      <div class="chat-note">
+        Top recommendation: <b>Design Roots</b> (₹37,940, 3–4 day turnaround).<br>
+        <span class="highlight-alert">Warning:</span> Avoid <b>BOTAAT</b> for this part. Quoted ₹81,240 (over 2x markup on large panels).<br>
+        <span class="btn-chip" style="margin-top: 3px;">Open Quote Comparison.xlsx</span>
+      </div>
+    </div>
+    <div class="backend-card">
+      <div class="backend-row">
+        <span class="tech-label">Jev Router</span>
+        <span class="tech-desc">Extracts parameters: <code>process: SLA ABS</code>, <code>part: front door panel</code>.</span>
+      </div>
+      <div class="backend-row">
+        <span class="tech-label">Drive API</span>
+        <span class="tech-desc">Scans Google Drive; locates <code>3D_Print_Vendors_Quote_Comparison.xlsx</code>.</span>
+      </div>
+      <div class="backend-row">
+        <span class="tech-label">Supabase</span>
+        <span class="tech-desc">Queries <code>vendors</code> table for supplier rating (4.5★) and contact details.</span>
+      </div>
+      <div class="backend-row">
+        <span class="tech-label">Gemini Flash</span>
+        <span class="tech-desc">Identifies single-part price spread anomaly; delivers cited summary in ~550ms.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 4 -->
+<div class="phase-section">
+  <div class="phase-heading">
+    <span class="phase-name">4. Unplanned absence and sub-owner failover</span>
+    <span class="phase-timing">Anytime / 24/7 · Automatic routing · Zero project slip</span>
+  </div>
+  <div class="phase-grid">
+    <div class="chat-card">
+      <div class="agent-label">Akash (to Assistant)</div>
+      <div class="user-response">Sick with fever today, won't be able to come in</div>
+      <div class="chat-note">
+        Assistant marks sheet <code>Leave = True</code>. Alerts sub-owner Sarah K.<br>
+        Sarah receives 1:1 stand-in request:
+      </div>
+      <div style="background: #ffffff; border: 1px solid #e4e4e7; padding: 4px 6px; font-size: 7.2pt; margin-top: 2px;">
+        Akash is sick on STC: BPillar. Can you cover today's CAD review?
+        <div class="button-row" style="margin-top: 3px;">
+          <span class="btn-chip selected">Yes, I can cover</span>
+          <span class="btn-chip">My plate is full</span>
+        </div>
+      </div>
+    </div>
+    <div class="backend-card">
+      <div class="backend-row">
+        <span class="tech-label">Jev Router</span>
+        <span class="tech-desc">Detects <code>intent = sick_leave</code> with 99.4% confidence; sets status to sick.</span>
+      </div>
+      <div class="backend-row">
+        <span class="tech-label">Sheets API</span>
+        <span class="tech-desc">Sets <code>Leave = True, Total Hours = 0</code> in Akash's monthly sheet automatically.</span>
+      </div>
+      <div class="backend-row">
+        <span class="tech-label">Failover Logic</span>
+        <span class="tech-desc">Queries projects where <code>lead_owner = Akash</code>; identifies sub-owner Sarah K.</span>
+      </div>
+      <div class="backend-row">
+        <span class="tech-label">Escalation</span>
+        <span class="tech-desc">Sends card to Sarah. If accepted: marks lead. If declined: alerts founders immediately.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <span>BangOps Architecture Blueprint</span>
+    <span>·</span>
+    <span>Bang Design (bangid.com)</span>
+    <span>·</span>
+    <span>Zero API costs on Google Workspace</span>
+  </div>
+  <div>
+    Est. monthly AI cost: $1.50–$3.00 · Free Supabase tier
+  </div>
+</footer>
+
+</body>
+</html>
